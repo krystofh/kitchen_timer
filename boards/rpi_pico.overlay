@@ -10,8 +10,8 @@
  */
 /{
 	aliases {
-		sw0 = &button0; // Button A
-		//btn1 = &button_b; // Button B
+		btn0 = &button0; // Button A
+		btn1 = &button1; // Button B
 		led = &status_led;
 	};
 
@@ -25,9 +25,13 @@
 
 	buttons {
         compatible = "gpio-keys";  // Compatible with gpio-keys driver
-        button0: button_0 {
+        button0: button_a {
             gpios = < &gpio0 4 (GPIO_PULL_UP | GPIO_ACTIVE_LOW) >;
             label = "Button controlling minutes";
+        };
+		button1: button_b {
+            gpios = < &gpio0 5 (GPIO_PULL_UP | GPIO_ACTIVE_LOW) >;
+            label = "Button controlling seconds";
         };
     };
 
