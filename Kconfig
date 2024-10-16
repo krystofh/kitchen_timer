@@ -21,3 +21,7 @@ endmenu
 module = MAIN
 module-str = main
 source "subsys/logging/Kconfig.template.log_config"
+
+module = EVENTS
+module-str = events
+source "subsys/logging/Kconfig.template.log_config"

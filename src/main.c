@@ -24,10 +24,12 @@
 #include <zephyr/version.h>
 
 // Own code
+#include "event_handler.h"
 
 /* 1000 msec = 1 sec */
 #define SLEEP_TIME_MS 20
-
+// Define the alias for the onboard LED
+#define STATUS_LED_NODE DT_NODELABEL(status_led)
 /*
  * Ensure that an overlay for USB serial has been defined.
  */
@@ -36,9 +38,37 @@ BUILD_ASSERT(DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_console), zephyr_cdc_acm_uart),
 
 LOG_MODULE_REGISTER(main, CONFIG_MAIN_LOG_LEVEL); // registers the log level for the module MAIN specified in Kconfig
 
+const struct gpio_dt_spec status_led = GPIO_DT_SPEC_GET(STATUS_LED_NODE, gpios); // onboard LED device
+
+// initialise all LED devices
+int init_leds()
+{
+	int ret;
+	if (!gpio_is_ready_dt(&status_led))
+	{
+		return 1;
+	}
+	ret = gpio_pin_configure_dt(&status_led, GPIO_OUTPUT_ACTIVE);
+	if (ret < 0)
+	{
+		return 1;
+	}
+	return 0;
+}
+
 int main(void)
 {
 	LOG_INF("Program starting\n"); // example info message
+
+	// Init the LED devices in logic 1 state
+	if (init_leds())
+	{
+		LOG_ERR("LEDs could not be initialised!");
+	}
+	else
+	{
+		LOG_INF("LED devices initialised properly");
+	}
 
 	// Shell config
 	const struct device *dev;
@@ -51,6 +81,16 @@ int main(void)
 	uart_line_ctrl_get(dev, UART_LINE_CTRL_DTR, &dtr);
 	k_sleep(K_MSEC(100));
 	LOG_INF("USB device configured and connected");
+
+	// Button config
+	if (init_buttons())
+	{
+		LOG_ERR("Button init failed!");
+	}
+	else
+	{
+		LOG_INF("Button init successful!");
+	}
 
 	// Wait in this loop for shell commands or process messages
 	while (true)
