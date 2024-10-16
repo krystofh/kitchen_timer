@@ -63,37 +63,37 @@
 
 	display_segments{
 		compatible = "gpio-leds";
-		seg_a:seg_a{
+		sega:seg_a{
 			gpios = <&gpio0 15 GPIO_ACTIVE_LOW>; // active low since common anode display
 			label = "Display segment A";
 		};
-		seg_b:seg_b{
+		segb:seg_b{
 			gpios = <&gpio0 13 GPIO_ACTIVE_LOW>; 
 			label = "Display segment B";
 		};
-		seg_c:seg_c{
+		segc:seg_c{
 			gpios = <&gpio0 11 GPIO_ACTIVE_LOW>;
 			label = "Display segment C";
 		};
-		seg_d:seg_d{
+		segd:seg_d{
 			gpios = <&gpio0 9 GPIO_ACTIVE_LOW>;
 			label = "Display segment D";
 		};
-		seg_e:seg_e{
+		sege:seg_e{
 			gpios = <&gpio0 8 GPIO_ACTIVE_LOW>;
 			label = "Display segment E";
 		};
-		seg_f:seg_f{
+		segf:seg_f{
 			gpios = <&gpio0 14 GPIO_ACTIVE_LOW>;
 			label = "Display segment F";
 		};
-		seg_g:seg_g{
+		segg:seg_g{
 			gpios = <&gpio0 12 GPIO_ACTIVE_LOW>;
 			label = "Display segment G";
 		};
-		seg_dp:seg_dp{
+		segdp:seg_dp{
 			gpios = <&gpio0 3 GPIO_ACTIVE_LOW>;
-			label = "Display segment DP";
+			label = "Display segment DP (decimal point)";
 		};
 	};
 };

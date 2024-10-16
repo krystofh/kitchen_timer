@@ -25,3 +25,7 @@ source "subsys/logging/Kconfig.template.log_config"
 module = EVENTS
 module-str = events
 source "subsys/logging/Kconfig.template.log_config"
+
+module = DISPLAY
+module-str = display
+source "subsys/logging/Kconfig.template.log_config"

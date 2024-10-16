@@ -25,6 +25,7 @@
 
 // Own code
 #include "event_handler.h"
+#include "display_driver.h"
 
 /* 1000 msec = 1 sec */
 #define SLEEP_TIME_MS 20
@@ -91,6 +92,17 @@ int main(void)
 	{
 		LOG_INF("Button init successful!");
 	}
+
+	// Display init
+	if (init_display())
+	{
+		LOG_ERR("Display init failed!");
+	}
+	else
+	{
+		LOG_INF("Display init successful!");
+	}
+	// display_demo(); // simple demo showing that hw and sw work
 
 	// Wait in this loop for shell commands or process messages
 	while (true)
