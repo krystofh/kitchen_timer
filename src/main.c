@@ -24,10 +24,6 @@
 #include <zephyr/version.h>
 
 // Own code
-#include "led_control.h"
-#include "console_demo.h"
-#include "button_control.h"
-#include "thread_communication.h"
 
 /* 1000 msec = 1 sec */
 #define SLEEP_TIME_MS 20
@@ -43,25 +39,6 @@ LOG_MODULE_REGISTER(main, CONFIG_MAIN_LOG_LEVEL); // registers the log level for
 int main(void)
 {
 	LOG_INF("Program starting\n"); // example info message
-	// Init the LED devices in logic 1 state
-	if (init_leds())
-	{
-		LOG_ERR("LEDs could not be initialised!");
-	}
-	else
-	{
-		LOG_INF("LED devices initialised properly");
-	}
-
-	// Button config
-	if (init_button())
-	{
-		LOG_ERR("Button init failed!");
-	}
-	else
-	{
-		LOG_INF("Button init successful!");
-	}
 
 	// Shell config
 	const struct device *dev;
@@ -71,25 +48,14 @@ int main(void)
 	{
 		return 0;
 	}
-	// while (!dtr) // wait for shell device to be ready
-	// {
 	uart_line_ctrl_get(dev, UART_LINE_CTRL_DTR, &dtr);
 	k_sleep(K_MSEC(100));
-	// }
 	LOG_INF("USB device configured and connected");
-
-	init_ll(); // init linked list
 
 	// Wait in this loop for shell commands or process messages
 	while (true)
 	{
 		/* If we have an LED, match its state to the button's. */
-		int val = gpio_pin_get_dt(&button);
-
-		if (val >= 0)
-		{
-			gpio_pin_set_dt(&button_led, val);
-		}
 		k_msleep(SLEEP_TIME_MS); /* sleep x ms*/
 	}
 	return 0;

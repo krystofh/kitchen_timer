@@ -1,9 +1,23 @@
 # Copyright (c) 2021 Nordic Semiconductor ASA
 # SPDX-License-Identifier: Apache-2.0
 #
-# This Kconfig file is picked by the Zephyr build system because it is defined
-# as the module Kconfig entry point (see zephyr/module.yml). You can browse
-# module options by going to Zephyr -> Modules in Kconfig.
+# This file is the application Kconfig entry point. All application Kconfig
+# options can be defined here or included via other application Kconfig files.
+# You can browse these options using the west targets menuconfig (terminal) or
+# guiconfig (GUI).
 
-rsource "drivers/Kconfig"
-rsource "lib/Kconfig"
+menu "Zephyr"
+source "Kconfig.zephyr"
+# USB communication
+config USB_PID_CONSOLE_SAMPLE
+    hex
+    default 0x0004
+    depends on USB_DEVICE_STACK
+config USB_DEVICE_PID
+    default USB_PID_CONSOLE_SAMPLE
+endmenu
+
+# Logging modules
+module = MAIN
+module-str = main
+source "subsys/logging/Kconfig.template.log_config"
