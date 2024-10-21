@@ -1,3 +1,6 @@
+#ifndef DISPLAY_DRIVER_H
+#define DISPLAY_DRIVER_H
+
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/shell/shell.h>
@@ -21,6 +24,16 @@ extern const struct gpio_dt_spec seg_f;
 extern const struct gpio_dt_spec seg_g;
 extern const struct gpio_dt_spec seg_dp;
 
+// Buffers
+extern const struct gpio_dt_spec *digit_buffer[];
+extern const struct gpio_dt_spec *segment_buffer[];
+
 // Functions
 int init_display(void);
 int display_demo(void);
+void display_digit(uint8_t number, uint8_t index);
+
+void reset_digit(uint8_t index);
+void reset_display(void);
+
+#endif // DISPLAY_DRIVER_H

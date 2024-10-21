@@ -102,8 +102,10 @@ int main(void)
 	{
 		LOG_INF("Display init successful!");
 	}
-	display_demo(); // simple demo showing that hw and sw work
-
+	// display_demo(); // simple demo showing that hw and sw work
+	display_digit(1, 0);
+	k_msleep(2000); /* sleep x ms*/
+	reset_display();
 	// Wait in this loop for shell commands or process messages
 	while (true)
 	{
