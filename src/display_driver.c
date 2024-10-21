@@ -1,5 +1,7 @@
 #include "display_driver.h"
 
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+
 LOG_MODULE_REGISTER(display, CONFIG_DISPLAY_LOG_LEVEL);
 
 // Digits GPIO configuration (active high)
@@ -77,18 +79,80 @@ int init_display()
     return 0;
 }
 
-// Simple demo showing 0 sequentially on all digits
+// Simple demo showing sequentially all segments on all digits
 int display_demo()
 {
-    int response = gpio_pin_set_dt(&digit_2, 1);
-    if (response < 0)
+    const struct gpio_dt_spec *digit_buffer[] = {&digit_1, &digit_2, &digit_3, &digit_4};
+    const struct gpio_dt_spec *segment_buffer[] = {&seg_a, &seg_b, &seg_c, &seg_d, &seg_e, &seg_f, &seg_g, &seg_dp};
+
+    bool enable_shutdown = false;
+    // Iterate through each digit in digit_buffer
+    for (int i = 0; i < ARRAY_SIZE(digit_buffer); i++)
     {
-        return 1;
-    }
-    response = gpio_pin_set_dt(&seg_f, 0); // try out segment A
-    if (response < 0)
-    {
-        return 1;
+        // Turn off all segemnts first
+        for (int m = 0; m < ARRAY_SIZE(segment_buffer); m++)
+        {
+            gpio_pin_set_dt(segment_buffer[m], 0);
+        }
+
+        // Turn off all digits first to prevent ghosting
+        for (int j = 0; j < ARRAY_SIZE(digit_buffer); j++)
+        {
+            gpio_pin_set_dt(digit_buffer[j], 0);
+        }
+
+        // Activate current digit
+        int response = gpio_pin_set_dt(digit_buffer[i], 1);
+
+        // Light up each segment (A to G, DP) sequentially
+        response = gpio_pin_set_dt(&seg_a, 1); // try out segment A
+        k_sleep(K_MSEC(1000));
+        if (enable_shutdown)
+        {
+            gpio_pin_set_dt(&seg_a, 0);
+        };
+        response = gpio_pin_set_dt(&seg_b, 1); // try out segment
+        k_sleep(K_MSEC(1000));
+        if (enable_shutdown)
+        {
+            response = gpio_pin_set_dt(&seg_b, 0); // try out segment
+        };
+        response = gpio_pin_set_dt(&seg_c, 1); // try out segment
+        k_sleep(K_MSEC(1000));
+        if (enable_shutdown)
+        {
+            response = gpio_pin_set_dt(&seg_c, 0); // try out segment
+        };
+        response = gpio_pin_set_dt(&seg_d, 1); // try out segment
+        k_sleep(K_MSEC(1000));
+        if (enable_shutdown)
+        {
+            response = gpio_pin_set_dt(&seg_d, 0); // try out segment
+        };
+        response = gpio_pin_set_dt(&seg_e, 1); // try out segment
+        k_sleep(K_MSEC(1000));
+        if (enable_shutdown)
+        {
+            response = gpio_pin_set_dt(&seg_e, 0); // try out segment
+        }
+        response = gpio_pin_set_dt(&seg_f, 1); // try out segment
+        k_sleep(K_MSEC(1000));
+        if (enable_shutdown)
+        {
+            response = gpio_pin_set_dt(&seg_f, 0); // try out segment
+        }
+        response = gpio_pin_set_dt(&seg_g, 1); // try out segment
+        k_sleep(K_MSEC(1000));
+        if (enable_shutdown)
+        {
+            response = gpio_pin_set_dt(&seg_g, 0); // try out segment
+        }
+        response = gpio_pin_set_dt(&seg_dp, 1); // try out segment
+        k_sleep(K_MSEC(1000));
+        if (enable_shutdown)
+        {
+            response = gpio_pin_set_dt(&seg_dp, 0); // try out segment
+        };
     }
     return 0;
 }

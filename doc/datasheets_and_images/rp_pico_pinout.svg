@@ -10,7 +10,7 @@
    xml:space="preserve"
    inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
    sodipodi:docname="rp_pico_pinout.svg"
-   inkscape:export-filename="rp_pico_pinout_transparent.png"
+   inkscape:export-filename="rp_pico_pinout..png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -30,13 +30,13 @@
      inkscape:zoom="0.8198895"
      inkscape:cx="250.64353"
      inkscape:cy="404.93262"
-     inkscape:window-width="1920"
-     inkscape:window-height="1027"
+     inkscape:window-width="1472"
+     inkscape:window-height="891"
      inkscape:window-x="0"
-     inkscape:window-y="25"
-     inkscape:window-maximized="1"
+     inkscape:window-y="37"
+     inkscape:window-maximized="0"
      inkscape:current-layer="layer2"
-     inkscape:export-bgcolor="#ffffff00" /><defs
+     inkscape:export-bgcolor="#ffffffff" /><defs
      id="defs1"><rect
        x="69.438225"
        y="447.14005"
