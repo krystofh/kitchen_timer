@@ -17,6 +17,15 @@ config USB_DEVICE_PID
     default USB_PID_CONSOLE_SAMPLE
 endmenu
 
+# Display settings
+menu "Display"
+config DISPLAY_FPS
+    int "Display frames per seconds"
+    default 24
+    help
+        Defines the display fps (frames per second)
+endmenu
+
 # Logging modules
 module = MAIN
 module-str = main

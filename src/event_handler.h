@@ -17,16 +17,42 @@
 #if !DT_NODE_HAS_STATUS_OKAY(BTN_B_NODE)
 #error "Unsupported board: btn1 devicetree alias is not defined"
 #endif
+#define BTN_C_NODE DT_ALIAS(btn2)
+#if !DT_NODE_HAS_STATUS_OKAY(BTN_C_NODE)
+#error "Unsupported board: btn2 devicetree alias is not defined"
+#endif
+#define BTN_D_NODE DT_ALIAS(btn3)
+#if !DT_NODE_HAS_STATUS_OKAY(BTN_D_NODE)
+#error "Unsupported board: btn3 devicetree alias is not defined"
+#endif
+
+/*
+ * Button structure to hold the GPIO configuration and callback data.
+ */
+struct button
+{
+    const struct gpio_dt_spec *spec;    // GPIO spec from device tree
+    struct gpio_callback *cb_data;      // Callback structure
+    gpio_callback_handler_t cb_handler; // Callback function
+};
 
 extern const struct gpio_dt_spec button_a;
 extern struct gpio_callback button_a_cb_data;
 extern const struct gpio_dt_spec button_b;
 extern struct gpio_callback button_b_cb_data;
+extern const struct gpio_dt_spec button_c;
+extern struct gpio_callback button_c_cb_data;
+extern const struct gpio_dt_spec button_d;
+extern struct gpio_callback button_d_cb_data;
 
 // Function declarations
 void button_a_pressed(const struct device *dev, struct gpio_callback *cb,
                       uint32_t pins);
 void button_b_pressed(const struct device *dev, struct gpio_callback *cb,
+                      uint32_t pins);
+void button_c_pressed(const struct device *dev, struct gpio_callback *cb,
+                      uint32_t pins);
+void button_d_pressed(const struct device *dev, struct gpio_callback *cb,
                       uint32_t pins);
 int init_buttons(void);
 

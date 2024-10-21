@@ -12,6 +12,8 @@
 	aliases {
 		btn0 = &button0; // Button A
 		btn1 = &button1; // Button B
+		btn2 = &button2; // Button C
+		btn3 = &button3; // Button D
 		led = &status_led;
 	};
 
@@ -31,6 +33,14 @@
         };
 		button1: button_b {
             gpios = < &gpio0 5 (GPIO_PULL_UP | GPIO_ACTIVE_LOW) >;
+            label = "Button controlling seconds";
+        };
+		button2: button_c {
+            gpios = < &gpio0 6 (GPIO_PULL_UP | GPIO_ACTIVE_LOW) >;
+            label = "Button controlling minutes";
+        };
+		button3: button_d {
+            gpios = < &gpio0 7 (GPIO_PULL_UP | GPIO_ACTIVE_LOW) >;
             label = "Button controlling seconds";
         };
     };
