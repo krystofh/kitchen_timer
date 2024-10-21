@@ -24,6 +24,7 @@
 #include <zephyr/version.h>
 
 // Own code
+#include "constants.h"
 #include "event_handler.h"
 #include "display_driver.h"
 
@@ -103,9 +104,12 @@ int main(void)
 		LOG_INF("Display init successful!");
 	}
 	// display_demo(); // simple demo showing that hw and sw work
-	display_digit(1, 0);
-	k_msleep(2000); /* sleep x ms*/
-	reset_display();
+	// display_digit(1, 0);
+	display_number(0);
+
+	// Test time
+	time_t test_time = {10, 30};
+
 	// Wait in this loop for shell commands or process messages
 	while (true)
 	{

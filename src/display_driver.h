@@ -6,6 +6,7 @@
 #include <zephyr/shell/shell.h>
 #include <zephyr/logging/log.h>
 #include <stdlib.h>
+#include "constants.h"
 
 #define DIGIT_DISPLAY_TIME_MS 5 // Time to display each digit
 
@@ -24,16 +25,20 @@ extern const struct gpio_dt_spec seg_f;
 extern const struct gpio_dt_spec seg_g;
 extern const struct gpio_dt_spec seg_dp;
 
-// Buffers
-extern const struct gpio_dt_spec *digit_buffer[];
-extern const struct gpio_dt_spec *segment_buffer[];
+// Digits and segments
+extern const struct gpio_dt_spec *digits[];
+extern const struct gpio_dt_spec *segments[];
+extern uint8_t display_buffer[];
 
 // Functions
 int init_display(void);
+void display_refresh_thread(void);
 int display_demo(void);
 void display_digit(uint8_t number, uint8_t index);
+void set_display_value(uint16_t value);
+void display_number(uint16_t number);
 
-void reset_digit(uint8_t index);
+void reset_segments(void);
 void reset_display(void);
 
 #endif // DISPLAY_DRIVER_H

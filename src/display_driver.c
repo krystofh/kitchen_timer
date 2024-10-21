@@ -1,5 +1,8 @@
 #include "display_driver.h"
 
+#define STACK_SIZE 1024
+#define DISP_THREAD_PRIORITY 4
+
 LOG_MODULE_REGISTER(display, CONFIG_DISPLAY_LOG_LEVEL);
 
 // Digits GPIO configuration (active high)
@@ -18,9 +21,11 @@ const struct gpio_dt_spec seg_f = GPIO_DT_SPEC_GET(DT_NODELABEL(segf), gpios);
 const struct gpio_dt_spec seg_g = GPIO_DT_SPEC_GET(DT_NODELABEL(segg), gpios);
 const struct gpio_dt_spec seg_dp = GPIO_DT_SPEC_GET(DT_NODELABEL(segdp), gpios);
 
-// Buffers
-const struct gpio_dt_spec *digit_buffer[] = {&digit_1, &digit_2, &digit_3, &digit_4};
-const struct gpio_dt_spec *segment_buffer[] = {&seg_a, &seg_b, &seg_c, &seg_d, &seg_e, &seg_f, &seg_g, &seg_dp};
+// Digits and segments
+const struct gpio_dt_spec *digits[] = {&digit_1, &digit_2, &digit_3, &digit_4};
+const struct gpio_dt_spec *segments[] = {&seg_a, &seg_b, &seg_c, &seg_d, &seg_e, &seg_f, &seg_g, &seg_dp};
+// Buffer to store the current digits to display
+uint8_t display_buffer[4] = {0, 0, 0, 0};
 
 // Digit encoding
 // 7-segment encoding for digits 0-9
@@ -36,6 +41,10 @@ const uint8_t digit_codes[10] = {
     0b01111111, // 8
     0b01101111  // 9
 };
+
+// Spawn thread
+K_THREAD_DEFINE(display_refresh_tid, STACK_SIZE, display_refresh_thread, NULL, NULL, NULL,
+                DISP_THREAD_PRIORITY, 0, 0);
 
 // Initialize the display GPIOs
 int init_display()
@@ -96,27 +105,39 @@ int init_display()
     return 0;
 }
 
+void display_refresh_thread()
+{
+    while (1)
+    {
+        for (uint8_t i = 0; i < ARRAY_SIZE(digits); i++)
+        {
+            display_digit(display_buffer[i], i);
+            k_sleep(K_MSEC(1000 / (ARRAY_SIZE(digits) * CONFIG_DISPLAY_FPS))); // period [ms]
+        }
+    }
+}
+
 // Simple demo showing sequentially all segments on all digits
 int display_demo()
 {
     bool enable_shutdown = false;
-    // Iterate through each digit in digit_buffer
-    for (int i = 0; i < ARRAY_SIZE(digit_buffer); i++)
+    // Iterate through each digit in digits
+    for (int i = 0; i < ARRAY_SIZE(digits); i++)
     {
         // Turn off all segemnts first
-        for (int m = 0; m < ARRAY_SIZE(segment_buffer); m++)
+        for (int m = 0; m < ARRAY_SIZE(segments); m++)
         {
-            gpio_pin_set_dt(segment_buffer[m], 0);
+            gpio_pin_set_dt(segments[m], 0);
         }
 
         // Turn off all digits first to prevent ghosting
-        for (int j = 0; j < ARRAY_SIZE(digit_buffer); j++)
+        for (int j = 0; j < ARRAY_SIZE(digits); j++)
         {
-            gpio_pin_set_dt(digit_buffer[j], 0);
+            gpio_pin_set_dt(digits[j], 0);
         }
 
         // Activate current digit
-        int response = gpio_pin_set_dt(digit_buffer[i], 1);
+        int response = gpio_pin_set_dt(digits[i], 1);
 
         // Light up each segment (A to G, DP) sequentially
         response = gpio_pin_set_dt(&seg_a, 1); // try out segment A
@@ -177,31 +198,54 @@ void display_digit(uint8_t digit, uint8_t index)
 {
     reset_display(); // make sure only one digit is displayed at a time
     // prepare the digit's index (select the 8-bit segment)
-    gpio_pin_set_dt(digit_buffer[index], 1);
+    gpio_pin_set_dt(digits[index], 1);
     // draw the digit
-    uint8_t temp_bin = digit_codes[digit];                   // binary representation of digit
-    for (uint8_t i = 0; i < ARRAY_SIZE(segment_buffer); i++) // go through one segment (bit) after the other
+    uint8_t temp_bin = digit_codes[digit];             // binary representation of digit
+    for (uint8_t i = 0; i < ARRAY_SIZE(segments); i++) // go through one segment (bit) after the other
     {
-        gpio_pin_set_dt(segment_buffer[i], temp_bin % 2); // if the bit is 1 -> set the segment ACTIVE
-        temp_bin = temp_bin >> 1;                         // right shift after the bit is processed
+        gpio_pin_set_dt(segments[i], temp_bin % 2); // if the bit is 1 -> set the segment ACTIVE
+        temp_bin = temp_bin >> 1;                   // right shift after the bit is processed
     }
 }
 
-// Reset (set INACTIVE) all segments of a digit (position)
-void reset_digit(uint8_t index)
+// Set the value to be displayed on the 4-digit display
+void set_display_value(uint16_t value)
 {
-    for (uint8_t i = 0; i < ARRAY_SIZE(segment_buffer); i++) // go through one segment (bit) after the other
+    // Convert the integer value to individual digits
+    display_buffer[0] = (value / 1000) % 10;
+    display_buffer[1] = (value / 100) % 10;
+    display_buffer[2] = (value / 10) % 10;
+    display_buffer[3] = value % 10;
+}
+
+// Checks if number is valid and sets it to the buffer for being regurarly refreshed
+void display_number(uint16_t number)
+{
+    if (number < 10000)
     {
-        gpio_pin_set_dt(segment_buffer[i], 0);
+        set_display_value(number);
+    }
+    else
+    {
+        LOG_ERR("Can't display numbers > 9999");
+    }
+}
+
+// Reset (set INACTIVE) all segments of the current position(s)
+void reset_segments(void)
+{
+    for (uint8_t i = 0; i < ARRAY_SIZE(segments); i++) // go through one segment (bit) after the other
+    {
+        gpio_pin_set_dt(segments[i], 0);
     }
 }
 
 // Reset (set INACTIVE) all digits (positions)
 void reset_display()
 {
-    for (uint8_t i = 0; i < ARRAY_SIZE(digit_buffer); i++)
+    reset_segments();
+    for (uint8_t i = 0; i < ARRAY_SIZE(digits); i++)
     {
-        reset_digit(i);
+        gpio_pin_set_dt(digits[i], 0);
     }
-    k_sleep(K_MSEC(20));
 }
