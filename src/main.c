@@ -24,7 +24,6 @@
 #include <zephyr/version.h>
 
 // Own code
-#include "constants.h"
 #include "event_handler.h"
 #include "display_driver.h"
 

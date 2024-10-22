@@ -45,9 +45,25 @@ extern struct gpio_callback button_c_cb_data;
 extern const struct gpio_dt_spec button_d;
 extern struct gpio_callback button_d_cb_data;
 
+// Time
+typedef struct time_t
+{
+    uint8_t minutes;
+    uint8_t seconds;
+};
+
+typedef enum timer_state
+{
+    SLEEPING,
+    SET_SECONDS,
+    SET_MINUTES,
+    COUNTDOWN,
+    ALARM
+};
+
 // Function declarations
-void button_a_pressed(const struct device *dev, struct gpio_callback *cb,
-                      uint32_t pins);
+
+void button_a_pressed(const struct device *dev, struct gpio_callback *cb, uint32_t pins);
 void button_b_pressed(const struct device *dev, struct gpio_callback *cb,
                       uint32_t pins);
 void button_c_pressed(const struct device *dev, struct gpio_callback *cb,

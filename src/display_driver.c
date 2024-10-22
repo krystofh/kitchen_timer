@@ -1,4 +1,5 @@
 #include "display_driver.h"
+#include "event_handler.h"
 
 #define STACK_SIZE 1024
 #define DISP_THREAD_PRIORITY 4
@@ -229,6 +230,12 @@ void display_number(uint16_t number)
     {
         LOG_ERR("Can't display numbers > 9999");
     }
+}
+
+void display_time(uint8_t minutes, uint8_t seconds)
+{
+    LOG_INF("Setting time to: %d : %d ", minutes, seconds);
+    set_display_value(minutes * 100 + seconds);
 }
 
 // Reset (set INACTIVE) all segments of the current position(s)
