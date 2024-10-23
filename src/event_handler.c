@@ -1,6 +1,7 @@
 #include "event_handler.h"
 
-#define DEBOUNCE_TIME_MS 50                            // Debouncing delay in milliseconds
+#define DEBOUNCE_TIME_MS 80                            // Debouncing delay in milliseconds
+#define LONG_PRESS_DURATION_MS 2000                    // Long press threshold in ms
 LOG_MODULE_REGISTER(events, CONFIG_LOG_DEFAULT_LEVEL); // Registers the log level for the module
 
 /*
@@ -23,15 +24,12 @@ struct gpio_callback button_d_cb_data;
  * Array of button structures for all the buttons to be initialized programmatically.
  */
 struct button buttons[] = {
-    {&button_a, &button_a_cb_data, button_a_pressed},
-    {&button_b, &button_b_cb_data, button_b_pressed},
-    {&button_c, &button_c_cb_data, button_c_pressed},
-    {&button_d, &button_d_cb_data, button_d_pressed}};
-
+    {&button_a, &button_a_cb_data, button_a_pressed, "A", false, 0},
+    {&button_b, &button_b_cb_data, button_b_pressed, "B", false, 0},
+    {&button_c, &button_c_cb_data, button_c_pressed, "C", false, 0},
+    {&button_d, &button_d_cb_data, button_d_pressed, "D", false, 0}};
 /* Work item for handling debouncing */
 static struct k_work_delayable button_work;
-/* Variable to track the last stable state of the button */
-static bool button_pressed = false;
 
 // Time logic
 struct time_t set_time = {0, 0};
@@ -116,22 +114,33 @@ void reset_time()
 // Button callback functions and debouncing
 
 /* Debouncing handler */
-void button_work_handler(struct k_work *work, struct button *button)
+void button_work_handler(struct k_work *work)
 {
-    /* Read button state after debounce delay */
-    bool current_state = gpio_pin_get_dt(button->spec);
-
-    /* If state changed, log it */
-    if (current_state != button_pressed)
+    // Iterate over each button to check their current state
+    for (int i = 0; i < ARRAY_SIZE(buttons); i++)
     {
-        button_pressed = current_state;
-        if (button_pressed)
+        bool current_state = gpio_pin_get_dt(buttons[i].spec);
+        if (current_state != buttons[i].pressed)
         {
-            LOG_INF("Button pressed");
-        }
-        else
-        {
-            LOG_INF("Button released");
+            buttons[i].pressed = current_state;
+            if (current_state)
+            {
+                buttons[i].press_time = k_uptime_get(); // time since boot in ms
+            }
+            else
+            {
+                int64_t duration = k_uptime_get() - buttons[i].press_time;
+                if (duration >= LONG_PRESS_DURATION_MS)
+                {
+                    // Long press detected
+                    LOG_INF("%s long press (duration: %lld ms)", buttons[i].label, duration);
+                }
+                else
+                {
+                    // Short press detected
+                    LOG_INF("%s short press (duration: %lld ms)", buttons[i].label, duration);
+                }
+            }
         }
     }
 }
@@ -139,8 +148,8 @@ void button_work_handler(struct k_work *work, struct button *button)
 void button_a_pressed(const struct device *dev, struct gpio_callback *cb,
                       uint32_t pins)
 {
-    k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS));
-    LOG_INF("Button A pressed at %" PRIu32 "", k_cycle_get_32());
+    k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS)); // wait until debounce processed
+    LOG_INF("Button A pressed at %lld ms", k_uptime_get());
     switch (current_state)
     {
     case SLEEPING:
@@ -161,7 +170,8 @@ void button_a_pressed(const struct device *dev, struct gpio_callback *cb,
 void button_b_pressed(const struct device *dev, struct gpio_callback *cb,
                       uint32_t pins)
 {
-    LOG_INF("Button B pressed at %" PRIu32 "", k_cycle_get_32());
+    k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS)); // wait until debounce processed
+    LOG_INF("Button B pressed at %lld ms", k_uptime_get());
     switch (current_state)
     {
     case SLEEPING:
@@ -183,7 +193,8 @@ void button_b_pressed(const struct device *dev, struct gpio_callback *cb,
 void button_c_pressed(const struct device *dev, struct gpio_callback *cb,
                       uint32_t pins)
 {
-    LOG_INF("Button C pressed at %" PRIu32 "", k_cycle_get_32());
+    k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS)); // wait until debounce processed
+    LOG_INF("Button C pressed at %lld ms", k_uptime_get());
     switch (current_state)
     {
     case SLEEPING:
@@ -202,7 +213,8 @@ void button_c_pressed(const struct device *dev, struct gpio_callback *cb,
 void button_d_pressed(const struct device *dev, struct gpio_callback *cb,
                       uint32_t pins)
 {
-    LOG_INF("Button D pressed at %" PRIu32 "", k_cycle_get_32());
+    k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS)); // wait until debounce processed
+    LOG_INF("Button D pressed at %lld ms", k_uptime_get());
     switch (current_state)
     {
     case SLEEPING:
@@ -221,6 +233,9 @@ void button_d_pressed(const struct device *dev, struct gpio_callback *cb,
 int init_button(const struct button *btn)
 {
     int ret;
+
+    // Initialize debounce work
+    k_work_init_delayable(&button_work, button_work_handler);
 
     if (!gpio_is_ready_dt(btn->spec))
     {
@@ -252,9 +267,7 @@ int init_button(const struct button *btn)
 int init_buttons(void)
 {
     int ret;
-    size_t num_buttons = ARRAY_SIZE(buttons); // Number of buttons
-
-    for (size_t i = 0; i < num_buttons; i++)
+    for (size_t i = 0; i < ARRAY_SIZE(buttons); i++)
     {
         ret = init_button(&buttons[i]);
         if (ret != 0)

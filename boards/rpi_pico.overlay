@@ -27,6 +27,7 @@
 
 	buttons {
         compatible = "gpio-keys";  // Compatible with gpio-keys driver
+		debounce-interval-ms = <50>;
         button0: button_a {
             gpios = < &gpio0 4 (GPIO_PULL_UP | GPIO_ACTIVE_LOW) >;
             label = "Button controlling minutes";

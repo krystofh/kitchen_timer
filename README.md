@@ -10,3 +10,6 @@ Kitchen timer based on 4-digit 8-segment display 3461BS and RP Pico
 - https://www.youtube.com/watch?v=sKJuzInKj_M
 - https://www.youtube.com/watch?v=256VQ6eVNng
 - https://www.youtube.com/watch?v=Fa7BHbPAM98
+
+- Switch debouncing https://zephyrproject.org/how-to-debounce-button-inputs-in-a-rtos/
+- PWM https://blog.golioth.io/adding-pwm-sound-in-zephyr/

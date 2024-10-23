@@ -35,7 +35,7 @@
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer2"
      inkscape:export-bgcolor="#ffffffff" /><defs
      id="defs1"><rect
        x="69.438225"
@@ -262,4 +262,14 @@
          id="tspan5-9"
          style="font-size:3.175px;fill:#008000;stroke:#008000;stroke-width:0.264583"
          x="30.155573"
-         y="88.399765">BTN_D</tspan></text></g></svg>
+         y="88.399765">BTN_D</tspan></text><text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:3.175px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#00ff00;stroke-width:0.264583"
+       x="141.43929"
+       y="60.054676"
+       id="text1-35-80-7"><tspan
+         sodipodi:role="line"
+         id="tspan1-22-2-0"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#00ff00;stroke-width:0.264583"
+         x="141.43929"
+         y="60.054676">Emitters</tspan></text></g></svg>
