@@ -15,6 +15,7 @@
 		btn2 = &button2; // Button C
 		btn3 = &button3; // Button D
 		led = &status_led;
+		buzzer-dev = &buzzer;
 	};
 
 	leds{
@@ -50,6 +51,15 @@
 		compatible = "blink-gpio-led";
 		led-gpios = <&gpio0 25 GPIO_ACTIVE_HIGH>; // built-in LED (unavailable on Pico W)
 		blink-period-ms = <1000>;
+	};
+
+	pwmbuzzer {
+		compatible = "pwm-leds";
+		status = "ok";
+		buzzer: buzzer_dev {
+			pwms = <&pwm 11 PWM_HZ(880) PWM_POLARITY_NORMAL>;
+			label = "Piezzo buzzer";
+		};
 	};
 
 	display_digits{
@@ -111,6 +121,13 @@
 
 &gpio0 {
 	status = "okay";
+};
+
+// Edit the PWM division, based on example blinky_pwm for RP Pico
+&pwm {
+	status = "okay";
+	divider-frac-4 = <15>;
+	divider-int-4 = <255>;
 };
 
 /* Shell console using USB

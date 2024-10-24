@@ -17,7 +17,7 @@
 #include <zephyr/sys/util.h>
 #include <zephyr/usb/usb_device.h>
 #include <zephyr/drivers/uart.h>
-
+#include <zephyr/drivers/pwm.h>
 // Shell libs
 #include <zephyr/kernel.h>
 #include <zephyr/shell/shell.h>
@@ -40,6 +40,7 @@ BUILD_ASSERT(DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_console), zephyr_cdc_acm_uart),
 LOG_MODULE_REGISTER(main, CONFIG_MAIN_LOG_LEVEL); // registers the log level for the module MAIN specified in Kconfig
 
 const struct gpio_dt_spec status_led = GPIO_DT_SPEC_GET(STATUS_LED_NODE, gpios); // onboard LED device
+static const struct pwm_dt_spec buzzer = PWM_DT_SPEC_GET(DT_ALIAS(buzzer_dev));	 // buzzer for sound
 
 // initialise all LED devices
 int init_leds()
@@ -60,7 +61,8 @@ int init_leds()
 int main(void)
 {
 	LOG_INF("Program starting\n"); // example info message
-
+	int ret;
+	ret = pwm_set_dt(&buzzer, PWM_HZ(294), PWM_HZ(294) / 2U);
 	// Init the LED devices in logic 1 state
 	if (init_leds())
 	{
