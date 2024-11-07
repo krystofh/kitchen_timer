@@ -8,6 +8,8 @@
 
 #include <stdlib.h>
 
+#include "sound_player.h"
+
 // Time
 typedef struct
 {

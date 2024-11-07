@@ -84,7 +84,11 @@ void dec_seconds()
         else
         { // 00:00
             LOG_ERR("Timer reached 00:00, can't decrease!");
-            stop_timer();
+            if (current_state == COUNTDOWN)
+            {
+                stop_timer();
+                play_sound(ALARM_SOUND, 1);
+            }
         }
     }
     display_time(&set_time);
@@ -98,6 +102,7 @@ void reset_time()
     current_state = SLEEPING; // TODO check if SET_SECONDS is not better
     LOG_INF("Reset performed");
     LOG_INF("Current state: %d", current_state);
+    play_sound(RESET_SOUND, 1);
 }
 
 // Timer countdown control
@@ -107,6 +112,7 @@ void run_timer()
     LOG_INF("Countdown started");
     k_work_init_delayable(&timer_work, update_timer); // start timer scheduling
     k_work_schedule(&timer_work, K_MSEC(1000));
+    play_sound(CONFIRM_SOUND, 1);
 }
 
 void stop_timer()
@@ -114,7 +120,6 @@ void stop_timer()
     current_state = SLEEPING; // TODO check if SET_SECONDS is not better
     k_work_cancel_delayable(&timer_work);
     LOG_INF("Countdown stopped");
-    k_sleep(K_MSEC(5));
 }
 
 // Work function that is rescheduled periodically
