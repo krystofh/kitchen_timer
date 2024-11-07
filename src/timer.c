@@ -1,4 +1,3 @@
-
 #include "timer.h"
 
 #define TIMER_STACK 1024
@@ -85,6 +84,7 @@ void dec_seconds()
         else
         { // 00:00
             LOG_ERR("Timer reached 00:00, can't decrease!");
+            stop_timer();
         }
     }
     display_time(&set_time);
@@ -103,25 +103,28 @@ void reset_time()
 // Timer countdown control
 void run_timer()
 {
+    current_state = COUNTDOWN;
     LOG_INF("Countdown started");
     k_work_init_delayable(&timer_work, update_timer); // start timer scheduling
-    k_work_schedule(&timer_work, K_NO_WAIT);
+    k_work_schedule(&timer_work, K_MSEC(1000));
 }
 
 void stop_timer()
 {
+    current_state = SLEEPING; // TODO check if SET_SECONDS is not better
     k_work_cancel_delayable(&timer_work);
     LOG_INF("Countdown stopped");
+    k_sleep(K_MSEC(5));
 }
 
 // Work function that is rescheduled periodically
 void update_timer(struct k_work *work)
 {
-    k_work_reschedule(&timer_work, K_MSEC(1000));
-    LOG_INF("Tick!");
-    // Change current time
-
-    // Update display
+    if (current_state == COUNTDOWN)
+    {
+        dec_seconds();
+        k_work_reschedule(&timer_work, K_MSEC(1000));
+    }
 }
 
 // Shell commands (mainly for development)
@@ -135,5 +138,11 @@ void cmd_start_countdown(const struct shell *sh, size_t argc, char **argv)
     run_timer();
 }
 
+void cmd_stop_countdown(const struct shell *sh, size_t argc, char **argv)
+{
+    stop_timer();
+}
+
 SHELL_CMD_REGISTER(reset, NULL, "Reset timer", cmd_reset_time);
 SHELL_CMD_REGISTER(start, NULL, "Starts the timer (countdown)", cmd_start_countdown);
+SHELL_CMD_REGISTER(stop, NULL, "Stops the timer (countdown)", cmd_stop_countdown);
