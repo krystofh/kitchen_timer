@@ -232,10 +232,10 @@ void display_number(uint16_t number)
     }
 }
 
-void display_time(uint8_t minutes, uint8_t seconds)
+void display_time(timevar_t *displayed_time)
 {
-    LOG_INF("Setting time to: %d : %d ", minutes, seconds);
-    set_display_value(minutes * 100 + seconds);
+    LOG_INF("Setting time to: %d : %d ", displayed_time->minutes, displayed_time->seconds);
+    set_display_value(displayed_time->minutes * 100 + displayed_time->seconds);
 }
 
 // Reset (set INACTIVE) all segments of the current position(s)

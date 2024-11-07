@@ -49,20 +49,20 @@ extern const struct gpio_dt_spec button_d;
 extern struct gpio_callback button_d_cb_data;
 
 // Time
-typedef struct time_t
+typedef struct
 {
     uint8_t minutes;
     uint8_t seconds;
-};
+} timevar_t;
 
-typedef enum timer_state
+typedef enum
 {
     SLEEPING,
     SET_SECONDS,
     SET_MINUTES,
     COUNTDOWN,
     ALARM
-};
+} timer_state;
 
 // Function declarations
 

@@ -1,4 +1,5 @@
 #include "event_handler.h"
+#include "sound_player.h"
 
 #define DEBOUNCE_TIME_MS 80                            // Debouncing delay in milliseconds
 #define LONG_PRESS_DURATION_MS 2000                    // Long press threshold in ms
@@ -32,9 +33,9 @@ struct button buttons[] = {
 static struct k_work_delayable button_work;
 
 // Time logic
-struct time_t set_time = {0, 0};
-struct time_t current_time = {0, 0};
-enum timer_state current_state = SLEEPING;
+timevar_t set_time = {0, 0};
+timevar_t current_time = {0, 0};
+timer_state current_state = SLEEPING;
 
 // Time functions
 void inc_minutes()
@@ -163,6 +164,8 @@ void button_a_pressed(const struct device *dev, struct gpio_callback *cb,
     case SET_MINUTES:
         inc_minutes();
         break;
+    default:
+        break;
     }
     LOG_INF("Current state: %d", current_state);
 }
@@ -185,6 +188,8 @@ void button_b_pressed(const struct device *dev, struct gpio_callback *cb,
     case SET_MINUTES:
         dec_minutes();
         break;
+    default:
+        break;
     }
     LOG_INF("Current state: %d", current_state);
 }
@@ -205,6 +210,8 @@ void button_c_pressed(const struct device *dev, struct gpio_callback *cb,
         LOG_INF("Setting minutes now.");
         current_state = SET_MINUTES;
         break;
+    default:
+        break;
     }
     LOG_INF("Current state: %d", current_state);
 }
@@ -224,6 +231,8 @@ void button_d_pressed(const struct device *dev, struct gpio_callback *cb,
     case SET_MINUTES:
         LOG_INF("Setting seconds now.");
         current_state = SET_SECONDS;
+        break;
+    default:
         break;
     }
     LOG_INF("Current state: %d", current_state);
@@ -266,14 +275,14 @@ int init_button(const struct button *btn)
 // Initialise buttons
 int init_buttons(void)
 {
-    int ret;
+    int ret = 0;
     for (size_t i = 0; i < ARRAY_SIZE(buttons); i++)
     {
         ret = init_button(&buttons[i]);
         if (ret != 0)
         {
             LOG_ERR("Button initialization failed for button %zu", i);
-            return ret;
         }
     }
+    return ret;
 }

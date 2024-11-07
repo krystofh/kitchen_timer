@@ -22,9 +22,10 @@ typedef enum
     RESET_SOUND
 } SoundID;
 
+void init_sound(const struct pwm_dt_spec *pwm_device);
 // Play functions
-void play_note(const struct pwm_dt_spec *device, int frequency, int duration_ms);
-void play_tune(const struct pwm_dt_spec *device, int *notes, int *durations, int length);
-void play_sound(const struct pwm_dt_spec *device, SoundID sound_id, uint16_t repetitions);
+void play_note(int frequency, int duration_ms);
+void play_tune(int *notes, int *durations, int length);
+void play_sound(SoundID sound_id, uint16_t repetitions);
 
 #endif

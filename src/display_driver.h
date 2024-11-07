@@ -6,6 +6,7 @@
 #include <zephyr/shell/shell.h>
 #include <zephyr/logging/log.h>
 #include <stdlib.h>
+#include "event_handler.h"
 
 #define DIGIT_DISPLAY_TIME_MS 5 // Time to display each digit
 
@@ -36,7 +37,7 @@ int display_demo(void);
 void display_digit(uint8_t number, uint8_t index);
 void set_display_value(uint16_t value);
 void display_number(uint16_t number);
-
+void display_time(timevar_t *displayed_time);
 void reset_segments(void);
 void reset_display(void);
 

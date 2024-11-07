@@ -63,12 +63,8 @@ int main(void)
 {
 	LOG_INF("Program starting\n"); // example info message
 
-	// pwm buzzer test
-	// int notes[] = {293, 0, 330};
-	// int note_durations[] = {1000, 1000, 1000};
-	// play_tune(&buzzer, notes, note_durations, sizeof(notes) / sizeof(notes[0]));
-
-	play_sound(&buzzer, ALARM_SOUND, 3);
+	// Init sound
+	init_sound(&buzzer);
 
 	// Init the LED devices in logic 1 state
 	if (init_leds())
@@ -111,12 +107,10 @@ int main(void)
 	{
 		LOG_INF("Display init successful!");
 	}
-	// display_demo(); // simple demo showing that hw and sw work
-	// display_digit(1, 0);
-	display_number(0);
 
 	// Test time
-	time_t test_time = {10, 30};
+	timevar_t test_time = {12, 54};
+	display_time(&test_time);
 
 	// Wait in this loop for shell commands or process messages
 	while (true)
