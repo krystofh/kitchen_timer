@@ -7,6 +7,7 @@
 #include <zephyr/sys/util.h>
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/shell/shell.h>
 #include <inttypes.h>
 
 #define BTN_A_NODE DT_ALIAS(btn0)

@@ -49,7 +49,7 @@ void inc_minutes()
     {
         set_time.minutes += 1;
     }
-    display_time(set_time.minutes, set_time.seconds);
+    display_time(&set_time);
 }
 
 void dec_minutes()
@@ -63,7 +63,7 @@ void dec_minutes()
     {
         set_time.minutes -= 1;
     }
-    display_time(set_time.minutes, set_time.seconds);
+    display_time(&set_time);
 }
 
 void inc_seconds()
@@ -78,7 +78,7 @@ void inc_seconds()
     {
         set_time.seconds += 1;
     }
-    display_time(set_time.minutes, set_time.seconds);
+    display_time(&set_time);
 }
 
 void dec_seconds()
@@ -100,15 +100,16 @@ void dec_seconds()
             LOG_ERR("Timer reached 00:00, can't decrease!");
         }
     }
-    display_time(set_time.minutes, set_time.seconds);
+    display_time(&set_time);
 }
 
 void reset_time()
 {
     set_time.minutes = 0;
     set_time.seconds = 0;
-    display_time(set_time.minutes, set_time.seconds);
+    display_time(&set_time);
     current_state = SLEEPING; // TODO check if SET_SECONDS is not better
+    LOG_INF("Reset performed");
     LOG_INF("Current state: %d", current_state);
 }
 
@@ -286,3 +287,11 @@ int init_buttons(void)
     }
     return ret;
 }
+
+// Shell commands (mainly for development)
+void cmd_reset_time(const struct shell *sh, size_t argc, char **argv)
+{
+    reset_time();
+}
+
+SHELL_CMD_REGISTER(reset, NULL, "Reset timer", cmd_reset_time);

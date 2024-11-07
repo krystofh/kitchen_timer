@@ -108,10 +108,6 @@ int main(void)
 		LOG_INF("Display init successful!");
 	}
 
-	// Test time
-	timevar_t test_time = {12, 54};
-	display_time(&test_time);
-
 	// Wait in this loop for shell commands or process messages
 	while (true)
 	{
