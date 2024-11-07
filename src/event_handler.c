@@ -113,6 +113,11 @@ void reset_time()
     LOG_INF("Current state: %d", current_state);
 }
 
+void start_countdown()
+{
+    LOG_INF("Countdown started");
+}
+
 // Button callback functions and debouncing
 
 /* Debouncing handler */
@@ -294,4 +299,10 @@ void cmd_reset_time(const struct shell *sh, size_t argc, char **argv)
     reset_time();
 }
 
+void cmd_start_countdown(const struct shell *sh, size_t argc, char **argv)
+{
+    start_countdown();
+}
+
 SHELL_CMD_REGISTER(reset, NULL, "Reset timer", cmd_reset_time);
+SHELL_CMD_REGISTER(start, NULL, "Starts the timer (countdown)", cmd_start_countdown);
