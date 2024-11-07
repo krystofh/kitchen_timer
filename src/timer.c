@@ -120,6 +120,7 @@ void stop_timer()
     current_state = SLEEPING; // TODO check if SET_SECONDS is not better
     k_work_cancel_delayable(&timer_work);
     LOG_INF("Countdown stopped");
+    play_sound(STOP_SOUND, 1);
 }
 
 // Work function that is rescheduled periodically

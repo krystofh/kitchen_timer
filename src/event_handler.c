@@ -125,10 +125,12 @@ void button_c_pressed(const struct device *dev, struct gpio_callback *cb,
     switch (current_state)
     {
     case SLEEPING:
+        // play_sound(MODE_SOUND, 1); // TODO implement sound thread
         LOG_INF("Exiting sleep mode. Setting minutes now.");
         set_state(SET_MINUTES);
         break;
     case SET_SECONDS:
+        // play_sound(MODE_SOUND, 1); // TODO implement sound thread
         LOG_INF("Setting minutes now.");
         set_state(SET_MINUTES);
         break;
@@ -148,10 +150,12 @@ void button_d_pressed(const struct device *dev, struct gpio_callback *cb,
     switch (current_state)
     {
     case SLEEPING:
+        // play_sound(MODE_SOUND, 1); // TODO implement sound thread
         LOG_INF("Exiting sleep mode. Setting seconds now.");
         set_state(SET_SECONDS);
         break;
     case SET_MINUTES:
+        // play_sound(MODE_SOUND, 1); // TODO implement sound thread
         LOG_INF("Setting seconds now.");
         set_state(SET_SECONDS);
         break;

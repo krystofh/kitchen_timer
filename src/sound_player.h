@@ -19,7 +19,8 @@ typedef enum
     CONFIRM_SOUND,
     MODE_SOUND,
     ALARM_SOUND,
-    RESET_SOUND
+    RESET_SOUND,
+    STOP_SOUND
 } SoundID;
 
 void init_sound(const struct pwm_dt_spec *pwm_device);

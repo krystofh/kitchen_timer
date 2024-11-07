@@ -17,6 +17,8 @@ const int alarm_notes[] = {880, 0, 880, 0, 880, 0};
 const int alarm_durations[] = {200, 200, 200, 200, 200, 200};
 const int reset_notes[] = {880, 440};
 const int reset_durations[] = {100, 100};
+const int stop_notes[] = {330, 0};
+const int stop_durations[] = {100, 50};
 
 // Spawn thread for sound output
 // K_THREAD_DEFINE(sound_player_tid, SOUND_STACK, sound_output_th,
@@ -28,7 +30,8 @@ static const Sound sounds[] = {
     {confirm_notes, confirm_durations, sizeof(confirm_notes) / sizeof(confirm_durations[0])},
     {mode_notes, mode_durations, sizeof(mode_notes) / sizeof(mode_notes[0])},
     {alarm_notes, alarm_durations, sizeof(alarm_notes) / sizeof(alarm_notes[0])}, // SOUND_ALARM
-    {reset_notes, reset_durations, sizeof(reset_notes) / sizeof(reset_notes[0])}  // SOUND_RESET
+    {reset_notes, reset_durations, sizeof(reset_notes) / sizeof(reset_notes[0])}, // SOUND_RESET
+    {stop_notes, stop_durations, sizeof(stop_notes) / sizeof(stop_notes[0])},
 };
 
 // void sound_output_th()
