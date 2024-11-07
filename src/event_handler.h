@@ -7,8 +7,10 @@
 #include <zephyr/sys/util.h>
 #include <zephyr/sys/printk.h>
 #include <zephyr/logging/log.h>
-#include <zephyr/shell/shell.h>
 #include <inttypes.h>
+
+#include "timer.h"
+#include "sound_player.h"
 
 #define BTN_A_NODE DT_ALIAS(btn0)
 #if !DT_NODE_HAS_STATUS_OKAY(BTN_A_NODE)
@@ -48,22 +50,6 @@ extern const struct gpio_dt_spec button_c;
 extern struct gpio_callback button_c_cb_data;
 extern const struct gpio_dt_spec button_d;
 extern struct gpio_callback button_d_cb_data;
-
-// Time
-typedef struct
-{
-    uint8_t minutes;
-    uint8_t seconds;
-} timevar_t;
-
-typedef enum
-{
-    SLEEPING,
-    SET_SECONDS,
-    SET_MINUTES,
-    COUNTDOWN,
-    ALARM
-} timer_state;
 
 // Function declarations
 

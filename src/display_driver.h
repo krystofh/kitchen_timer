@@ -6,7 +6,7 @@
 #include <zephyr/shell/shell.h>
 #include <zephyr/logging/log.h>
 #include <stdlib.h>
-#include "event_handler.h"
+#include "timer.h"
 
 #define DIGIT_DISPLAY_TIME_MS 5 // Time to display each digit
 

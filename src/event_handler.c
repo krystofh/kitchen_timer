@@ -1,5 +1,4 @@
 #include "event_handler.h"
-#include "sound_player.h"
 
 #define DEBOUNCE_TIME_MS 80                            // Debouncing delay in milliseconds
 #define LONG_PRESS_DURATION_MS 2000                    // Long press threshold in ms
@@ -31,92 +30,6 @@ struct button buttons[] = {
     {&button_d, &button_d_cb_data, button_d_pressed, "D", false, 0}};
 /* Work item for handling debouncing */
 static struct k_work_delayable button_work;
-
-// Time logic
-timevar_t set_time = {0, 0};
-timevar_t current_time = {0, 0};
-timer_state current_state = SLEEPING;
-
-// Time functions
-void inc_minutes()
-{
-    LOG_INF("INC minutes called: %d:%d -> +1", set_time.minutes, set_time.seconds);
-    if (set_time.minutes == 99)
-    {
-        LOG_ERR("Timer can't increase minutes count more than 99!");
-    }
-    else
-    {
-        set_time.minutes += 1;
-    }
-    display_time(&set_time);
-}
-
-void dec_minutes()
-{
-    LOG_INF("DEC minutes called: %d:%d -> -1", set_time.minutes, set_time.seconds);
-    if (set_time.minutes == 0)
-    {
-        LOG_ERR("Timer reached 0 minutes. Can't decrease further!");
-    }
-    else
-    {
-        set_time.minutes -= 1;
-    }
-    display_time(&set_time);
-}
-
-void inc_seconds()
-{
-    LOG_INF("INC seconds called: %d:%d -> +1", set_time.minutes, set_time.seconds);
-    if (set_time.seconds == 59)
-    {
-        inc_minutes();
-        set_time.seconds = 0;
-    }
-    else
-    {
-        set_time.seconds += 1;
-    }
-    display_time(&set_time);
-}
-
-void dec_seconds()
-{
-    LOG_INF("DEC seconds called: %d:%d -> -1", set_time.minutes, set_time.seconds);
-    if (set_time.seconds > 0)
-    {
-        set_time.seconds -= 1;
-    }
-    else // XX:00 set
-    {
-        if (set_time.minutes > 0)
-        { // 01:00 -> 00:59
-            dec_minutes();
-            set_time.seconds = 59;
-        }
-        else
-        { // 00:00
-            LOG_ERR("Timer reached 00:00, can't decrease!");
-        }
-    }
-    display_time(&set_time);
-}
-
-void reset_time()
-{
-    set_time.minutes = 0;
-    set_time.seconds = 0;
-    display_time(&set_time);
-    current_state = SLEEPING; // TODO check if SET_SECONDS is not better
-    LOG_INF("Reset performed");
-    LOG_INF("Current state: %d", current_state);
-}
-
-void start_countdown()
-{
-    LOG_INF("Countdown started");
-}
 
 // Button callback functions and debouncing
 
@@ -157,11 +70,12 @@ void button_a_pressed(const struct device *dev, struct gpio_callback *cb,
 {
     k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS)); // wait until debounce processed
     LOG_INF("Button A pressed at %lld ms", k_uptime_get());
+    timer_state current_state = get_state();
     switch (current_state)
     {
     case SLEEPING:
         LOG_INF("Exiting sleep mode. Setting seconds now.");
-        current_state = SET_SECONDS;
+        set_state(SET_SECONDS);
         inc_seconds();
         break;
     case SET_SECONDS:
@@ -181,11 +95,12 @@ void button_b_pressed(const struct device *dev, struct gpio_callback *cb,
 {
     k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS)); // wait until debounce processed
     LOG_INF("Button B pressed at %lld ms", k_uptime_get());
+    timer_state current_state = get_state();
     switch (current_state)
     {
     case SLEEPING:
         LOG_INF("Exiting sleep mode. Setting seconds now.");
-        current_state = SET_SECONDS;
+        set_state(SET_SECONDS);
         dec_seconds();
         break;
     case SET_SECONDS:
@@ -206,15 +121,16 @@ void button_c_pressed(const struct device *dev, struct gpio_callback *cb,
 {
     k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS)); // wait until debounce processed
     LOG_INF("Button C pressed at %lld ms", k_uptime_get());
+    timer_state current_state = get_state();
     switch (current_state)
     {
     case SLEEPING:
         LOG_INF("Exiting sleep mode. Setting minutes now.");
-        current_state = SET_MINUTES;
+        set_state(SET_MINUTES);
         break;
     case SET_SECONDS:
         LOG_INF("Setting minutes now.");
-        current_state = SET_MINUTES;
+        set_state(SET_MINUTES);
         break;
     default:
         break;
@@ -228,15 +144,16 @@ void button_d_pressed(const struct device *dev, struct gpio_callback *cb,
 {
     k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS)); // wait until debounce processed
     LOG_INF("Button D pressed at %lld ms", k_uptime_get());
+    timer_state current_state = get_state();
     switch (current_state)
     {
     case SLEEPING:
         LOG_INF("Exiting sleep mode. Setting seconds now.");
-        current_state = SET_SECONDS;
+        set_state(SET_SECONDS);
         break;
     case SET_MINUTES:
         LOG_INF("Setting seconds now.");
-        current_state = SET_SECONDS;
+        set_state(SET_SECONDS);
         break;
     default:
         break;
@@ -292,17 +209,3 @@ int init_buttons(void)
     }
     return ret;
 }
-
-// Shell commands (mainly for development)
-void cmd_reset_time(const struct shell *sh, size_t argc, char **argv)
-{
-    reset_time();
-}
-
-void cmd_start_countdown(const struct shell *sh, size_t argc, char **argv)
-{
-    start_countdown();
-}
-
-SHELL_CMD_REGISTER(reset, NULL, "Reset timer", cmd_reset_time);
-SHELL_CMD_REGISTER(start, NULL, "Starts the timer (countdown)", cmd_start_countdown);

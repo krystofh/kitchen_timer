@@ -24,8 +24,9 @@
 #include <zephyr/version.h>
 
 // Own code
-#include "event_handler.h"
 #include "display_driver.h"
+#include "timer.h"
+#include "event_handler.h"
 #include "sound_player.h"
 
 /* 1000 msec = 1 sec */

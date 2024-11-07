@@ -1,5 +1,4 @@
 #include "display_driver.h"
-#include "event_handler.h"
 
 #define STACK_SIZE 1024
 #define DISP_THREAD_PRIORITY 5
