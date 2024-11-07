@@ -2,7 +2,7 @@
 #include "event_handler.h"
 
 #define STACK_SIZE 1024
-#define DISP_THREAD_PRIORITY 4
+#define DISP_THREAD_PRIORITY 5
 
 LOG_MODULE_REGISTER(display, CONFIG_DISPLAY_LOG_LEVEL);
 

@@ -38,3 +38,7 @@ source "subsys/logging/Kconfig.template.log_config"
 module = DISPLAY
 module-str = display
 source "subsys/logging/Kconfig.template.log_config"
+
+module = TIMER
+module-str = timer
+source "subsys/logging/Kconfig.template.log_config"
