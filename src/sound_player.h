@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <zephyr/drivers/pwm.h>
 #include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
 
 typedef struct
 {
@@ -23,6 +24,12 @@ typedef enum
     STOP_SOUND
 } SoundID;
 
+typedef struct
+{
+    SoundID sound;
+} SoundEvent;
+
+void sound_processing_thread(void);
 void init_sound(const struct pwm_dt_spec *pwm_device);
 // Play functions
 void play_note(int frequency, int duration_ms);

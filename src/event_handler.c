@@ -69,6 +69,7 @@ void button_a_pressed(const struct device *dev, struct gpio_callback *cb,
                       uint32_t pins)
 {
     k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS)); // wait until debounce processed
+    play_sound(CLICK_SOUND, 1);
     LOG_INF("Button A pressed at %lld ms", k_uptime_get());
     timer_state current_state = get_state();
     switch (current_state)
@@ -94,6 +95,7 @@ void button_b_pressed(const struct device *dev, struct gpio_callback *cb,
                       uint32_t pins)
 {
     k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS)); // wait until debounce processed
+    play_sound(CLICK_SOUND, 1);
     LOG_INF("Button B pressed at %lld ms", k_uptime_get());
     timer_state current_state = get_state();
     switch (current_state)
@@ -120,6 +122,7 @@ void button_c_pressed(const struct device *dev, struct gpio_callback *cb,
                       uint32_t pins)
 {
     k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS)); // wait until debounce processed
+    play_sound(MODE_SOUND, 1);
     LOG_INF("Button C pressed at %lld ms", k_uptime_get());
     timer_state current_state = get_state();
     switch (current_state)
@@ -145,6 +148,7 @@ void button_d_pressed(const struct device *dev, struct gpio_callback *cb,
                       uint32_t pins)
 {
     k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS)); // wait until debounce processed
+    play_sound(MODE_SOUND, 1);
     LOG_INF("Button D pressed at %lld ms", k_uptime_get());
     timer_state current_state = get_state();
     switch (current_state)

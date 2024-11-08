@@ -42,3 +42,7 @@ source "subsys/logging/Kconfig.template.log_config"
 module = TIMER
 module-str = timer
 source "subsys/logging/Kconfig.template.log_config"
+
+module = SOUND
+module-str = sound
+source "subsys/logging/Kconfig.template.log_config"
