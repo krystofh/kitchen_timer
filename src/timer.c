@@ -86,8 +86,9 @@ void dec_seconds()
             LOG_ERR("Timer reached 00:00, can't decrease!");
             if (current_state == COUNTDOWN)
             {
+                current_state = ALARM;
                 stop_timer();
-                play_sound(ALARM_SOUND, 1);
+                play_sound(ALARM_SOUND, 3);
             }
         }
     }
@@ -117,10 +118,13 @@ void run_timer()
 
 void stop_timer()
 {
+    if (current_state != ALARM)
+    {
+        play_sound(STOP_SOUND, 1); // do not play when alarm shall play now
+    }
     current_state = SLEEPING; // TODO check if SET_SECONDS is not better
     k_work_cancel_delayable(&timer_work);
     LOG_INF("Countdown stopped");
-    play_sound(STOP_SOUND, 1);
 }
 
 // Work function that is rescheduled periodically

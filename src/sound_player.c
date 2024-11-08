@@ -1,4 +1,5 @@
 #include "sound_player.h"
+#include "tones.h" // for music notation
 
 #define SOUND_STACK 1024
 #define SOUND_THREAD_PRIORITY 7 // low priority
@@ -9,21 +10,21 @@ LOG_MODULE_REGISTER(sound, CONFIG_LOG_DEFAULT_LEVEL); // Registers the log level
 static const struct pwm_dt_spec *speaker;
 
 // Sounds
-const int click_notes[] = {880, 0};
+const int click_notes[] = {A5, 0};
 const int click_durations[] = {100, 50};
-const int confirm_notes[] = {440, 880};
+const int confirm_notes[] = {A4, A5};
 const int confirm_durations[] = {100, 100};
-const int mode_notes[] = {588, 0};
+const int mode_notes[] = {D5, 0};
 const int mode_durations[] = {100, 50};
-const int alarm_notes[] = {880, 0, 880, 0, 880, 0};
-const int alarm_durations[] = {200, 200, 200, 200, 200, 200};
-const int reset_notes[] = {880, 440};
+const int alarm_notes[] = {A5, 0, A5, 0, A5, 0};
+const int alarm_durations[] = {150, 150, 150, 150, 150, 150};
+const int reset_notes[] = {A5, A4};
 const int reset_durations[] = {100, 100};
-const int stop_notes[] = {330, 0};
+const int stop_notes[] = {E4, 0};
 const int stop_durations[] = {100, 50};
 
 // Define message queue for handling sound events
-K_MSGQ_DEFINE(sound_queue, 1, 1, 1);
+K_MSGQ_DEFINE(sound_queue, CONFIG_SOUND_MSG_NUMBER, CONFIG_SOUND_MSG_NUMBER, 1); // sizeof(SoundEvent) 1 byte -> bytesize=number of messages
 
 // Spawn thread for sound output
 K_THREAD_DEFINE(sound_player_tid, SOUND_STACK, sound_processing_thread,
@@ -56,7 +57,6 @@ void sound_processing_thread()
         {
             LOG_ERR("Error playing sound");
         }
-        k_sleep(K_MSEC(100));
     }
 }
 

@@ -26,6 +26,15 @@ config DISPLAY_FPS
         Defines the display fps (frames per second)
 endmenu
 
+# Sound settings
+menu "Sound"
+config SOUND_MSG_NUMBER
+    int "Number of sound events that can be stored in queue"
+    default 20
+    help
+        Number of sound events that can be stored in queue
+endmenu
+
 # Logging modules
 module = MAIN
 module-str = main
