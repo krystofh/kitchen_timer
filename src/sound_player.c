@@ -57,6 +57,7 @@ void sound_processing_thread()
         {
             LOG_ERR("Error playing sound");
         }
+        k_sleep(K_MSEC(100));
     }
 }
 

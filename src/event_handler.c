@@ -85,6 +85,9 @@ void button_a_pressed(const struct device *dev, struct gpio_callback *cb,
     case SET_MINUTES:
         inc_minutes();
         break;
+    case ALARM:
+        stop_alarm(); // stops alarm sound on button press
+        break;
     default:
         break;
     }
@@ -110,6 +113,9 @@ void button_b_pressed(const struct device *dev, struct gpio_callback *cb,
         break;
     case SET_MINUTES:
         dec_minutes();
+        break;
+    case ALARM:
+        stop_alarm(); // stops alarm sound on button press
         break;
     default:
         break;
@@ -137,6 +143,9 @@ void button_c_pressed(const struct device *dev, struct gpio_callback *cb,
         LOG_INF("Setting minutes now.");
         set_state(SET_MINUTES);
         break;
+    case ALARM:
+        stop_alarm(); // stops alarm sound on button press
+        break;
     default:
         break;
     }
@@ -162,6 +171,9 @@ void button_d_pressed(const struct device *dev, struct gpio_callback *cb,
         // play_sound(MODE_SOUND, 1); // TODO implement sound thread
         LOG_INF("Setting seconds now.");
         set_state(SET_SECONDS);
+        break;
+    case ALARM:
+        stop_alarm(); // stops alarm sound on button press
         break;
     default:
         break;

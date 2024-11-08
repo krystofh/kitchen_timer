@@ -6,6 +6,7 @@
 LOG_MODULE_REGISTER(timer, CONFIG_LOG_DEFAULT_LEVEL); // Registers the log level for the module
 
 static struct k_work_delayable timer_work;
+static struct k_work_delayable alarm_work;
 
 // Time logic
 timevar_t set_time = {0, 0};
@@ -88,11 +89,33 @@ void dec_seconds()
             {
                 current_state = ALARM;
                 stop_timer();
-                play_sound(ALARM_SOUND, 3);
+                sound_alarm(true);
             }
         }
     }
     display_time(&set_time);
+}
+
+void sound_alarm(bool forever)
+{
+    if (forever)
+    {
+        if (current_state == ALARM) // sound alarm until a button is pressed
+        {
+            k_work_init_delayable(&alarm_work, alarm_work_handler); // start alarm scheduling
+            k_work_schedule(&alarm_work, K_NO_WAIT);
+        }
+    }
+    else
+    {
+        play_sound(ALARM_SOUND, 3); // play alarm few times and go to sleep
+        current_state = SLEEPING;
+    }
+}
+
+void stop_alarm()
+{
+    current_state = SLEEPING;
 }
 
 void reset_time()
@@ -121,8 +144,8 @@ void stop_timer()
     if (current_state != ALARM)
     {
         play_sound(STOP_SOUND, 1); // do not play when alarm shall play now
+        current_state = SLEEPING;  // put to sleep only if not alarm sounding
     }
-    current_state = SLEEPING; // TODO check if SET_SECONDS is not better
     k_work_cancel_delayable(&timer_work);
     LOG_INF("Countdown stopped");
 }
@@ -134,6 +157,16 @@ void update_timer(struct k_work *work)
     {
         dec_seconds();
         k_work_reschedule(&timer_work, K_MSEC(1000));
+    }
+}
+
+// work handler to play alarm sound at regular intervals
+void alarm_work_handler(struct k_work *work)
+{
+    if (current_state == ALARM)
+    {
+        play_sound(ALARM_SOUND, 1);                   // Play the alarm sound
+        k_work_reschedule(&alarm_work, K_MSEC(1000)); // Reschedule for 1 second later, must be larger than 1 alarm sound
     }
 }
 

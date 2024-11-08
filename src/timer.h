@@ -43,6 +43,11 @@ void run_timer(void);
 void stop_timer(void);
 void update_timer(struct k_work *work);
 
+// Alarm
+void sound_alarm(bool forever);
+void stop_alarm(void);
+void alarm_work_handler(struct k_work *work);
+
 // Shell commands
 void cmd_reset_time(const struct shell *sh, size_t argc, char **argv);
 void cmd_start_countdown(const struct shell *sh, size_t argc, char **argv);
