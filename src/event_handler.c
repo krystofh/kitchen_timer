@@ -166,25 +166,21 @@ static void button_work_c_handler(struct k_work *work)
     // Onpress of debounced button C
     if (evt == BUTTON_EVT_PRESSED)
     {
-        play_sound(MODE_SOUND, 1);
         LOG_INF("Button C pressed at %lld ms", k_uptime_get());
         timer_state current_state = get_state();
         switch (current_state)
         {
-        case SLEEPING:
-            // play_sound(MODE_SOUND, 1); // TODO implement sound thread
-            LOG_INF("Exiting sleep mode. Setting minutes now.");
-            set_state(SET_MINUTES);
-            break;
-        case SET_SECONDS:
-            // play_sound(MODE_SOUND, 1); // TODO implement sound thread
-            LOG_INF("Setting minutes now.");
-            set_state(SET_MINUTES);
-            break;
         case ALARM:
             stop_alarm(); // stops alarm sound on button press
             break;
+        case COUNTDOWN:
+            stop_timer(); // pause timer
+            break;
+        case SLEEPING:
+            run_timer();
+            break;
         default:
+            run_timer(); // start timer
             break;
         }
         LOG_INF("Current state: %d", current_state);
@@ -196,9 +192,10 @@ static void button_work_c_handler(struct k_work *work)
     }
 }
 
+// On long press of button C
 static void longpress_c_work_handler(struct k_work *work)
 {
-    LOG_INF("long press C detected");
+    reset_time();
 }
 
 // Interrupt service routine for BUTTON C
@@ -230,12 +227,14 @@ static void button_work_d_handler(struct k_work *work)
         switch (current_state)
         {
         case SLEEPING:
-            // play_sound(MODE_SOUND, 1); // TODO implement sound thread
             LOG_INF("Exiting sleep mode. Setting seconds now.");
             set_state(SET_SECONDS);
             break;
+        case SET_SECONDS:
+            LOG_INF("Setting minutes now.");
+            set_state(SET_MINUTES);
+            break;
         case SET_MINUTES:
-            // play_sound(MODE_SOUND, 1); // TODO implement sound thread
             LOG_INF("Setting seconds now.");
             set_state(SET_SECONDS);
             break;
