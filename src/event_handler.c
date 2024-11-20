@@ -1,7 +1,6 @@
 #include "event_handler.h"
 
 #define DEBOUNCE_TIME_MS 15                            // Debouncing delay in milliseconds
-#define LONG_PRESS_DURATION_MS 1000                    // Long press threshold in ms
 LOG_MODULE_REGISTER(events, CONFIG_LOG_DEFAULT_LEVEL); // Registers the log level for the module
 
 /*
@@ -71,7 +70,7 @@ static void button_work_a_handler(struct k_work *work)
             break;
         }
         LOG_INF("Current state: %d", current_state);
-        k_work_reschedule(&longpress_a_work, K_MSEC(LONG_PRESS_DURATION_MS));
+        k_work_reschedule(&longpress_a_work, K_MSEC(CONFIG_LONGPRESS_DURATION_MS));
     }
     else
     {
@@ -130,7 +129,7 @@ static void button_work_b_handler(struct k_work *work)
             break;
         }
         LOG_INF("Current state: %d", current_state);
-        k_work_reschedule(&longpress_b_work, K_MSEC(LONG_PRESS_DURATION_MS));
+        k_work_reschedule(&longpress_b_work, K_MSEC(CONFIG_LONGPRESS_DURATION_MS));
     }
     else
     {
@@ -184,7 +183,7 @@ static void button_work_c_handler(struct k_work *work)
             break;
         }
         LOG_INF("Current state: %d", current_state);
-        k_work_reschedule(&longpress_c_work, K_MSEC(LONG_PRESS_DURATION_MS));
+        k_work_reschedule(&longpress_c_work, K_MSEC(CONFIG_LONGPRESS_DURATION_MS));
     }
     else
     {
@@ -245,7 +244,7 @@ static void button_work_d_handler(struct k_work *work)
             break;
         }
         LOG_INF("Current state: %d", current_state);
-        k_work_reschedule(&longpress_d_work, K_MSEC(LONG_PRESS_DURATION_MS));
+        k_work_reschedule(&longpress_d_work, K_MSEC(CONFIG_LONGPRESS_DURATION_MS));
     }
     else
     {

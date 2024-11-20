@@ -35,6 +35,15 @@ config SOUND_MSG_NUMBER
         Number of sound events that can be stored in queue
 endmenu
 
+# Button settings
+menu "Buttons"
+config LONGPRESS_DURATION_MS
+    int "Minimal longpress duration in ms"
+    default 1000
+    help
+        Sets the minimal time required for longpress recognition
+endmenu
+
 # Logging modules
 module = MAIN
 module-str = main
