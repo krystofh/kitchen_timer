@@ -44,8 +44,6 @@ struct button
     struct gpio_callback *cb_data;      // Callback structure
     gpio_callback_handler_t cb_handler; // Callback function
     const char *label;                  // Button label (e.g., "Button A")
-    bool pressed;                       // Button state (pressed/released)
-    int64_t press_time;                 // Timestamp of when the button was pressed
 };
 
 extern const struct gpio_dt_spec button_a;

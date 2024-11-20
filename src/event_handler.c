@@ -34,10 +34,10 @@ static struct k_work_delayable longpress_d_work;
  * Array of button structures for all the buttons to be initialized programmatically.
  */
 struct button buttons[] = {
-    {&button_a, &button_a_cb_data, button_a_isr, "A", false, 0},
-    {&button_b, &button_b_cb_data, button_b_isr, "B", false, 0},
-    {&button_c, &button_c_cb_data, button_c_isr, "C", false, 0},
-    {&button_d, &button_d_cb_data, button_d_isr, "D", false, 0}};
+    {&button_a, &button_a_cb_data, button_a_isr, "A"},
+    {&button_b, &button_b_cb_data, button_b_isr, "B"},
+    {&button_c, &button_c_cb_data, button_c_isr, "C"},
+    {&button_d, &button_d_cb_data, button_d_isr, "D"}};
 
 // Function to handle the work (debounce timer expiration)
 static void button_work_a_handler(struct k_work *work)
@@ -54,9 +54,9 @@ static void button_work_a_handler(struct k_work *work)
         switch (current_state)
         {
         case SLEEPING:
-            LOG_INF("Exiting sleep mode. Setting seconds now.");
-            set_state(SET_SECONDS);
-            inc_seconds();
+            LOG_INF("Exiting sleep mode. Setting minutes now.");
+            set_state(SET_MINUTES);
+            inc_minutes();
             break;
         case SET_SECONDS:
             inc_seconds();
@@ -106,9 +106,9 @@ static void button_work_b_handler(struct k_work *work)
         switch (current_state)
         {
         case SLEEPING:
-            LOG_INF("Exiting sleep mode. Setting seconds now.");
-            set_state(SET_SECONDS);
-            dec_seconds();
+            LOG_INF("Exiting sleep mode. Setting minutes now.");
+            set_state(SET_MINUTES);
+            dec_minutes();
             break;
         case SET_SECONDS:
             dec_seconds();
