@@ -29,6 +29,12 @@
 #error "Unsupported board: btn3 devicetree alias is not defined"
 #endif
 
+enum button_evt
+{
+    BUTTON_EVT_PRESSED,
+    BUTTON_EVT_RELEASED
+};
+
 /*
  * Button structure to hold the GPIO configuration and callback data.
  */
@@ -53,13 +59,18 @@ extern struct gpio_callback button_d_cb_data;
 
 // Function declarations
 
-void button_a_pressed(const struct device *dev, struct gpio_callback *cb, uint32_t pins);
-void button_b_pressed(const struct device *dev, struct gpio_callback *cb,
-                      uint32_t pins);
-void button_c_pressed(const struct device *dev, struct gpio_callback *cb,
-                      uint32_t pins);
-void button_d_pressed(const struct device *dev, struct gpio_callback *cb,
-                      uint32_t pins);
+static void button_work_a_handler(struct k_work *work);
+static void button_work_b_handler(struct k_work *work);
+static void button_work_c_handler(struct k_work *work);
+static void button_work_d_handler(struct k_work *work);
+
+void button_a_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins);
+void button_b_isr(const struct device *dev, struct gpio_callback *cb,
+                  uint32_t pins);
+void button_c_isr(const struct device *dev, struct gpio_callback *cb,
+                  uint32_t pins);
+void button_d_isr(const struct device *dev, struct gpio_callback *cb,
+                  uint32_t pins);
 int init_buttons(void);
 
 #endif // EVENT_HANDLER_H

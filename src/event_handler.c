@@ -1,6 +1,6 @@
 #include "event_handler.h"
 
-#define DEBOUNCE_TIME_MS 80                            // Debouncing delay in milliseconds
+#define DEBOUNCE_TIME_MS 15                            // Debouncing delay in milliseconds
 #define LONG_PRESS_DURATION_MS 2000                    // Long press threshold in ms
 LOG_MODULE_REGISTER(events, CONFIG_LOG_DEFAULT_LEVEL); // Registers the log level for the module
 
@@ -20,175 +20,238 @@ struct gpio_callback button_b_cb_data;
 struct gpio_callback button_c_cb_data;
 struct gpio_callback button_d_cb_data;
 
+static struct k_work_delayable button_a_work;
+static struct k_work_delayable button_b_work;
+static struct k_work_delayable button_c_work;
+static struct k_work_delayable button_d_work;
+
+static struct k_work_delayable longpress_a_work;
+static struct k_work_delayable longpress_b_work;
+static struct k_work_delayable longpress_c_work;
+static struct k_work_delayable longpress_d_work;
+
 /*
  * Array of button structures for all the buttons to be initialized programmatically.
  */
 struct button buttons[] = {
-    {&button_a, &button_a_cb_data, button_a_pressed, "A", false, 0},
-    {&button_b, &button_b_cb_data, button_b_pressed, "B", false, 0},
-    {&button_c, &button_c_cb_data, button_c_pressed, "C", false, 0},
-    {&button_d, &button_d_cb_data, button_d_pressed, "D", false, 0}};
-/* Work item for handling debouncing */
-static struct k_work_delayable button_work;
+    {&button_a, &button_a_cb_data, button_a_isr, "A", false, 0},
+    {&button_b, &button_b_cb_data, button_b_isr, "B", false, 0},
+    {&button_c, &button_c_cb_data, button_c_isr, "C", false, 0},
+    {&button_d, &button_d_cb_data, button_d_isr, "D", false, 0}};
 
-// Button callback functions and debouncing
-
-/* Debouncing handler */
-void button_work_handler(struct k_work *work)
+// Function to handle the work (debounce timer expiration)
+static void button_work_a_handler(struct k_work *work)
 {
-    // Iterate over each button to check their current state
-    for (int i = 0; i < ARRAY_SIZE(buttons); i++)
+    ARG_UNUSED(work);
+    int val = gpio_pin_get_dt(&button_a);
+    enum button_evt evt = val ? BUTTON_EVT_PRESSED : BUTTON_EVT_RELEASED;
+    // Onpress of debounced button A
+    if (evt == BUTTON_EVT_PRESSED)
     {
-        bool current_state = gpio_pin_get_dt(buttons[i].spec);
-        if (current_state != buttons[i].pressed)
+        play_sound(CLICK_SOUND, 1);
+        LOG_INF("Button A pressed at %lld ms", k_uptime_get());
+        timer_state current_state = get_state();
+        switch (current_state)
         {
-            buttons[i].pressed = current_state;
-            if (current_state)
-            {
-                buttons[i].press_time = k_uptime_get(); // time since boot in ms
-            }
-            else
-            {
-                int64_t duration = k_uptime_get() - buttons[i].press_time;
-                if (duration >= LONG_PRESS_DURATION_MS)
-                {
-                    // Long press detected
-                    LOG_INF("%s long press (duration: %lld ms)", buttons[i].label, duration);
-                }
-                else
-                {
-                    // Short press detected
-                    LOG_INF("%s short press (duration: %lld ms)", buttons[i].label, duration);
-                }
-            }
+        case SLEEPING:
+            LOG_INF("Exiting sleep mode. Setting seconds now.");
+            set_state(SET_SECONDS);
+            inc_seconds();
+            break;
+        case SET_SECONDS:
+            inc_seconds();
+            break;
+        case SET_MINUTES:
+            inc_minutes();
+            break;
+        case ALARM:
+            stop_alarm(); // stops alarm sound on button press
+            break;
+        default:
+            break;
         }
+        LOG_INF("Current state: %d", current_state);
+        // k_work_reschedule(&longpress_work, K_MSEC(LONGPRESS_OFFSET_MS));
+    }
+    else
+    {
+        // k_work_cancel_delayable(&longpress_work); // on release, clear longpress queue
     }
 }
 
-void button_a_pressed(const struct device *dev, struct gpio_callback *cb,
-                      uint32_t pins)
+void button_a_isr(const struct device *dev, struct gpio_callback *cb,
+                  uint32_t pins)
 {
-    k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS)); // wait until debounce processed
-    play_sound(CLICK_SOUND, 1);
-    LOG_INF("Button A pressed at %lld ms", k_uptime_get());
-    timer_state current_state = get_state();
-    switch (current_state)
+    // Check if work queue has some pending work (button already being debounced)
+    if (k_work_delayable_is_pending(&button_a_work))
     {
-    case SLEEPING:
-        LOG_INF("Exiting sleep mode. Setting seconds now.");
-        set_state(SET_SECONDS);
-        inc_seconds();
-        break;
-    case SET_SECONDS:
-        inc_seconds();
-        break;
-    case SET_MINUTES:
-        inc_minutes();
-        break;
-    case ALARM:
-        stop_alarm(); // stops alarm sound on button press
-        break;
-    default:
-        break;
+        // Cancel ongoing work and reschedule debounce timer
+        k_work_cancel_delayable(&button_a_work);
     }
-    LOG_INF("Current state: %d", current_state);
+    // Reschedule debounce work for x ms
+    k_work_reschedule(&button_a_work, K_MSEC(DEBOUNCE_TIME_MS));
 }
 
-void button_b_pressed(const struct device *dev, struct gpio_callback *cb,
-                      uint32_t pins)
+static void button_work_b_handler(struct k_work *work)
 {
-    k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS)); // wait until debounce processed
-    play_sound(CLICK_SOUND, 1);
-    LOG_INF("Button B pressed at %lld ms", k_uptime_get());
-    timer_state current_state = get_state();
-    switch (current_state)
+    ARG_UNUSED(work);
+    int val = gpio_pin_get_dt(&button_b);
+    enum button_evt evt = val ? BUTTON_EVT_PRESSED : BUTTON_EVT_RELEASED;
+    // Onpress of debounced button B
+    if (evt == BUTTON_EVT_PRESSED)
     {
-    case SLEEPING:
-        LOG_INF("Exiting sleep mode. Setting seconds now.");
-        set_state(SET_SECONDS);
-        dec_seconds();
-        break;
-    case SET_SECONDS:
-        dec_seconds();
-        break;
-    case SET_MINUTES:
-        dec_minutes();
-        break;
-    case ALARM:
-        stop_alarm(); // stops alarm sound on button press
-        break;
-    default:
-        break;
+        play_sound(CLICK_SOUND, 1);
+        LOG_INF("Button B pressed at %lld ms", k_uptime_get());
+        timer_state current_state = get_state();
+        switch (current_state)
+        {
+        case SLEEPING:
+            LOG_INF("Exiting sleep mode. Setting seconds now.");
+            set_state(SET_SECONDS);
+            dec_seconds();
+            break;
+        case SET_SECONDS:
+            dec_seconds();
+            break;
+        case SET_MINUTES:
+            dec_minutes();
+            break;
+        case ALARM:
+            stop_alarm(); // stops alarm sound on button press
+            break;
+        default:
+            break;
+        }
+        LOG_INF("Current state: %d", current_state);
+        // k_work_reschedule(&longpress_work, K_MSEC(LONGPRESS_OFFSET_MS));
     }
-    LOG_INF("Current state: %d", current_state);
+    else
+    {
+        // k_work_cancel_delayable(&longpress_work); // on release, clear longpress queue
+    }
+}
+
+void button_b_isr(const struct device *dev, struct gpio_callback *cb,
+                  uint32_t pins)
+{
+    // Check if work queue has some pending work (button already being debounced)
+    if (k_work_delayable_is_pending(&button_b_work))
+    {
+        // Cancel ongoing work and reschedule debounce timer
+        k_work_cancel_delayable(&button_b_work);
+    }
+    // Reschedule debounce work for x ms
+    k_work_reschedule(&button_b_work, K_MSEC(DEBOUNCE_TIME_MS));
+}
+
+static void button_work_c_handler(struct k_work *work)
+{
+    ARG_UNUSED(work);
+    int val = gpio_pin_get_dt(&button_c);
+    enum button_evt evt = val ? BUTTON_EVT_PRESSED : BUTTON_EVT_RELEASED;
+    // Onpress of debounced button C
+    if (evt == BUTTON_EVT_PRESSED)
+    {
+        play_sound(MODE_SOUND, 1);
+        LOG_INF("Button C pressed at %lld ms", k_uptime_get());
+        timer_state current_state = get_state();
+        switch (current_state)
+        {
+        case SLEEPING:
+            // play_sound(MODE_SOUND, 1); // TODO implement sound thread
+            LOG_INF("Exiting sleep mode. Setting minutes now.");
+            set_state(SET_MINUTES);
+            break;
+        case SET_SECONDS:
+            // play_sound(MODE_SOUND, 1); // TODO implement sound thread
+            LOG_INF("Setting minutes now.");
+            set_state(SET_MINUTES);
+            break;
+        case ALARM:
+            stop_alarm(); // stops alarm sound on button press
+            break;
+        default:
+            break;
+        }
+        LOG_INF("Current state: %d", current_state);
+        // k_work_reschedule(&longpress_work, K_MSEC(LONGPRESS_OFFSET_MS));
+    }
+    else
+    {
+        // k_work_cancel_delayable(&longpress_work); // on release, clear longpress queue
+    }
 }
 
 // Left button (C) switches to minutes control
-void button_c_pressed(const struct device *dev, struct gpio_callback *cb,
-                      uint32_t pins)
+void button_c_isr(const struct device *dev, struct gpio_callback *cb,
+                  uint32_t pins)
 {
-    k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS)); // wait until debounce processed
-    play_sound(MODE_SOUND, 1);
-    LOG_INF("Button C pressed at %lld ms", k_uptime_get());
-    timer_state current_state = get_state();
-    switch (current_state)
+    // Check if work queue has some pending work (button already being debounced)
+    if (k_work_delayable_is_pending(&button_c_work))
     {
-    case SLEEPING:
-        // play_sound(MODE_SOUND, 1); // TODO implement sound thread
-        LOG_INF("Exiting sleep mode. Setting minutes now.");
-        set_state(SET_MINUTES);
-        break;
-    case SET_SECONDS:
-        // play_sound(MODE_SOUND, 1); // TODO implement sound thread
-        LOG_INF("Setting minutes now.");
-        set_state(SET_MINUTES);
-        break;
-    case ALARM:
-        stop_alarm(); // stops alarm sound on button press
-        break;
-    default:
-        break;
+        // Cancel ongoing work and reschedule debounce timer
+        k_work_cancel_delayable(&button_c_work);
     }
-    LOG_INF("Current state: %d", current_state);
+    // Reschedule debounce work for x ms
+    k_work_reschedule(&button_c_work, K_MSEC(DEBOUNCE_TIME_MS));
+}
+
+static void button_work_d_handler(struct k_work *work)
+{
+    ARG_UNUSED(work);
+    int val = gpio_pin_get_dt(&button_d);
+    enum button_evt evt = val ? BUTTON_EVT_PRESSED : BUTTON_EVT_RELEASED;
+    // Onpress of debounced button D
+    if (evt == BUTTON_EVT_PRESSED)
+    {
+        play_sound(MODE_SOUND, 1);
+        LOG_INF("Button D pressed at %lld ms", k_uptime_get());
+        timer_state current_state = get_state();
+        switch (current_state)
+        {
+        case SLEEPING:
+            // play_sound(MODE_SOUND, 1); // TODO implement sound thread
+            LOG_INF("Exiting sleep mode. Setting seconds now.");
+            set_state(SET_SECONDS);
+            break;
+        case SET_MINUTES:
+            // play_sound(MODE_SOUND, 1); // TODO implement sound thread
+            LOG_INF("Setting seconds now.");
+            set_state(SET_SECONDS);
+            break;
+        case ALARM:
+            stop_alarm(); // stops alarm sound on button press
+            break;
+        default:
+            break;
+        }
+        LOG_INF("Current state: %d", current_state);
+        // k_work_reschedule(&longpress_work, K_MSEC(LONGPRESS_OFFSET_MS));
+    }
+    else
+    {
+        // k_work_cancel_delayable(&longpress_work); // on release, clear longpress queue
+    }
 }
 
 // Right button (D) switches to seconds control
-void button_d_pressed(const struct device *dev, struct gpio_callback *cb,
-                      uint32_t pins)
+void button_d_isr(const struct device *dev, struct gpio_callback *cb,
+                  uint32_t pins)
 {
-    k_work_reschedule(&button_work, K_MSEC(DEBOUNCE_TIME_MS)); // wait until debounce processed
-    play_sound(MODE_SOUND, 1);
-    LOG_INF("Button D pressed at %lld ms", k_uptime_get());
-    timer_state current_state = get_state();
-    switch (current_state)
+    // Check if work queue has some pending work (button already being debounced)
+    if (k_work_delayable_is_pending(&button_d_work))
     {
-    case SLEEPING:
-        // play_sound(MODE_SOUND, 1); // TODO implement sound thread
-        LOG_INF("Exiting sleep mode. Setting seconds now.");
-        set_state(SET_SECONDS);
-        break;
-    case SET_MINUTES:
-        // play_sound(MODE_SOUND, 1); // TODO implement sound thread
-        LOG_INF("Setting seconds now.");
-        set_state(SET_SECONDS);
-        break;
-    case ALARM:
-        stop_alarm(); // stops alarm sound on button press
-        break;
-    default:
-        break;
+        // Cancel ongoing work and reschedule debounce timer
+        k_work_cancel_delayable(&button_d_work);
     }
-    LOG_INF("Current state: %d", current_state);
+    // Reschedule debounce work for x ms
+    k_work_reschedule(&button_d_work, K_MSEC(DEBOUNCE_TIME_MS));
 }
 
 // Generalized function to initialize a button
 int init_button(const struct button *btn)
 {
     int ret;
-
-    // Initialize debounce work
-    k_work_init_delayable(&button_work, button_work_handler);
-
     if (!gpio_is_ready_dt(btn->spec))
     {
         LOG_ERR("Error: button device %s is not ready", btn->spec->port->name);
@@ -202,7 +265,7 @@ int init_button(const struct button *btn)
         return 1;
     }
 
-    ret = gpio_pin_interrupt_configure_dt(btn->spec, GPIO_INT_EDGE_TO_ACTIVE);
+    ret = gpio_pin_interrupt_configure_dt(btn->spec, GPIO_INT_EDGE_BOTH);
     if (ret != 0)
     {
         LOG_ERR("Error %d: failed to configure interrupt on %s pin %d", ret, btn->spec->port->name, btn->spec->pin);
@@ -227,5 +290,12 @@ int init_buttons(void)
             LOG_ERR("Button initialization failed for button %zu", i);
         }
     }
+
+    // Init works
+    k_work_init_delayable(&button_a_work, button_work_a_handler);
+    k_work_init_delayable(&button_b_work, button_work_b_handler);
+    k_work_init_delayable(&button_c_work, button_work_c_handler);
+    k_work_init_delayable(&button_d_work, button_work_d_handler);
+
     return ret;
 }
