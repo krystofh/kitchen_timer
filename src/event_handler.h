@@ -62,6 +62,11 @@ static void button_work_b_handler(struct k_work *work);
 static void button_work_c_handler(struct k_work *work);
 static void button_work_d_handler(struct k_work *work);
 
+static void longpress_a_work_handler(struct k_work *work);
+static void longpress_b_work_handler(struct k_work *work);
+static void longpress_c_work_handler(struct k_work *work);
+static void longpress_d_work_handler(struct k_work *work);
+
 void button_a_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins);
 void button_b_isr(const struct device *dev, struct gpio_callback *cb,
                   uint32_t pins);

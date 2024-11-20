@@ -1,7 +1,7 @@
 #include "event_handler.h"
 
 #define DEBOUNCE_TIME_MS 15                            // Debouncing delay in milliseconds
-#define LONG_PRESS_DURATION_MS 2000                    // Long press threshold in ms
+#define LONG_PRESS_DURATION_MS 1000                    // Long press threshold in ms
 LOG_MODULE_REGISTER(events, CONFIG_LOG_DEFAULT_LEVEL); // Registers the log level for the module
 
 /*
@@ -39,7 +39,7 @@ struct button buttons[] = {
     {&button_c, &button_c_cb_data, button_c_isr, "C"},
     {&button_d, &button_d_cb_data, button_d_isr, "D"}};
 
-// Function to handle the work (debounce timer expiration)
+// Button A actions on press or release after debounce
 static void button_work_a_handler(struct k_work *work)
 {
     ARG_UNUSED(work);
@@ -71,27 +71,34 @@ static void button_work_a_handler(struct k_work *work)
             break;
         }
         LOG_INF("Current state: %d", current_state);
-        // k_work_reschedule(&longpress_work, K_MSEC(LONGPRESS_OFFSET_MS));
+        k_work_reschedule(&longpress_a_work, K_MSEC(LONG_PRESS_DURATION_MS));
     }
     else
     {
-        // k_work_cancel_delayable(&longpress_work); // on release, clear longpress queue
+        k_work_cancel_delayable(&longpress_a_work); // on release, clear longpress queue
     }
 }
 
+static void longpress_a_work_handler(struct k_work *work)
+{
+    LOG_INF("long press A detected");
+}
+
+// Interrupt service routine for BUTTON A (+)
 void button_a_isr(const struct device *dev, struct gpio_callback *cb,
                   uint32_t pins)
 {
     // Check if work queue has some pending work (button already being debounced)
     if (k_work_delayable_is_pending(&button_a_work))
     {
-        // Cancel ongoing work and reschedule debounce timer
+        // Cancel ongoing work and reschedule debounce timer to debounce
         k_work_cancel_delayable(&button_a_work);
     }
     // Reschedule debounce work for x ms
     k_work_reschedule(&button_a_work, K_MSEC(DEBOUNCE_TIME_MS));
 }
 
+// Button B actions on press or release after debounce
 static void button_work_b_handler(struct k_work *work)
 {
     ARG_UNUSED(work);
@@ -123,27 +130,34 @@ static void button_work_b_handler(struct k_work *work)
             break;
         }
         LOG_INF("Current state: %d", current_state);
-        // k_work_reschedule(&longpress_work, K_MSEC(LONGPRESS_OFFSET_MS));
+        k_work_reschedule(&longpress_b_work, K_MSEC(LONG_PRESS_DURATION_MS));
     }
     else
     {
-        // k_work_cancel_delayable(&longpress_work); // on release, clear longpress queue
+        k_work_cancel_delayable(&longpress_b_work); // on release, clear longpress queue
     }
 }
 
+static void longpress_b_work_handler(struct k_work *work)
+{
+    LOG_INF("long press B detected");
+}
+
+// Interrupt service routine for BUTTON B (-)
 void button_b_isr(const struct device *dev, struct gpio_callback *cb,
                   uint32_t pins)
 {
     // Check if work queue has some pending work (button already being debounced)
     if (k_work_delayable_is_pending(&button_b_work))
     {
-        // Cancel ongoing work and reschedule debounce timer
+        // Cancel ongoing work and reschedule debounce timer to debounce
         k_work_cancel_delayable(&button_b_work);
     }
     // Reschedule debounce work for x ms
     k_work_reschedule(&button_b_work, K_MSEC(DEBOUNCE_TIME_MS));
 }
 
+// Button C actions on press or release after debounce
 static void button_work_c_handler(struct k_work *work)
 {
     ARG_UNUSED(work);
@@ -174,28 +188,34 @@ static void button_work_c_handler(struct k_work *work)
             break;
         }
         LOG_INF("Current state: %d", current_state);
-        // k_work_reschedule(&longpress_work, K_MSEC(LONGPRESS_OFFSET_MS));
+        k_work_reschedule(&longpress_c_work, K_MSEC(LONG_PRESS_DURATION_MS));
     }
     else
     {
-        // k_work_cancel_delayable(&longpress_work); // on release, clear longpress queue
+        k_work_cancel_delayable(&longpress_c_work); // on release, clear longpress queue
     }
 }
 
-// Left button (C) switches to minutes control
+static void longpress_c_work_handler(struct k_work *work)
+{
+    LOG_INF("long press C detected");
+}
+
+// Interrupt service routine for BUTTON C
 void button_c_isr(const struct device *dev, struct gpio_callback *cb,
                   uint32_t pins)
 {
     // Check if work queue has some pending work (button already being debounced)
     if (k_work_delayable_is_pending(&button_c_work))
     {
-        // Cancel ongoing work and reschedule debounce timer
+        // Cancel ongoing work and reschedule debounce timer to debounce
         k_work_cancel_delayable(&button_c_work);
     }
     // Reschedule debounce work for x ms
     k_work_reschedule(&button_c_work, K_MSEC(DEBOUNCE_TIME_MS));
 }
 
+// Button D actions on press or release after debounce
 static void button_work_d_handler(struct k_work *work)
 {
     ARG_UNUSED(work);
@@ -226,22 +246,27 @@ static void button_work_d_handler(struct k_work *work)
             break;
         }
         LOG_INF("Current state: %d", current_state);
-        // k_work_reschedule(&longpress_work, K_MSEC(LONGPRESS_OFFSET_MS));
+        k_work_reschedule(&longpress_d_work, K_MSEC(LONG_PRESS_DURATION_MS));
     }
     else
     {
-        // k_work_cancel_delayable(&longpress_work); // on release, clear longpress queue
+        k_work_cancel_delayable(&longpress_d_work); // on release, clear longpress queue
     }
 }
 
-// Right button (D) switches to seconds control
+static void longpress_d_work_handler(struct k_work *work)
+{
+    LOG_INF("long press D detected");
+}
+
+// Interrupt service routine for BUTTON D
 void button_d_isr(const struct device *dev, struct gpio_callback *cb,
                   uint32_t pins)
 {
     // Check if work queue has some pending work (button already being debounced)
     if (k_work_delayable_is_pending(&button_d_work))
     {
-        // Cancel ongoing work and reschedule debounce timer
+        // Cancel ongoing work and reschedule debounce timer to debounce
         k_work_cancel_delayable(&button_d_work);
     }
     // Reschedule debounce work for x ms
@@ -296,6 +321,11 @@ int init_buttons(void)
     k_work_init_delayable(&button_b_work, button_work_b_handler);
     k_work_init_delayable(&button_c_work, button_work_c_handler);
     k_work_init_delayable(&button_d_work, button_work_d_handler);
+
+    k_work_init_delayable(&longpress_a_work, longpress_a_work_handler);
+    k_work_init_delayable(&longpress_b_work, longpress_b_work_handler);
+    k_work_init_delayable(&longpress_c_work, longpress_c_work_handler);
+    k_work_init_delayable(&longpress_d_work, longpress_d_work_handler);
 
     return ret;
 }
