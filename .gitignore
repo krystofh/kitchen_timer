@@ -18,4 +18,4 @@ __pycache__/
 # misc
 .DS_STORE
 /electronics/kitchen_timer-backups/*
-/electronics/*.zip
+*.zip
