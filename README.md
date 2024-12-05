@@ -2,6 +2,17 @@
 
 Kitchen timer based on 4-digit 8-segment display 3461BS and RP Pico
 
+|<img src='img/pcb_front.png' width='400px'>|
+|-|
+|**Front view of the PCB**|
+
+
+|<img src='img/pcb_back.png' width='400px'>|
+|-|
+|**Back view of the PCB**|
+
+
+
 ## Electronics
 
 The used display is a common anode display. The datasheet specifies 10 mA typical current for the optical characteristics of a segment. The GPIOs of RP Pico can provide 12 mA max. The built-in `3V3OUT` voltage regulator can output up to 300 mA, which is sufficient for all 8 segemts. Not the full 32 segments are needed since the digits are displayed with a given refresh rate sequentially once at a time. Simulation using LTSpice and PNP transistor `BCS327-25` leads to the choice of resistor value
