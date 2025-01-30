@@ -58,7 +58,12 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [],
+      "drc_exclusions": [
+        "shorting_items|118500000|40000000|ce797adb-db82-47c7-9e1f-673947160a66|5983e6b0-218d-4ed7-97ff-b22257f394d9",
+        "shorting_items|125250000|40000000|d5a40b99-ec87-4ad8-96ee-23c121c57dc9|b4986bed-9e3a-4657-b677-1e2b4f13537c",
+        "solder_mask_bridge|118500000|40000000|5983e6b0-218d-4ed7-97ff-b22257f394d9|ce797adb-db82-47c7-9e1f-673947160a66",
+        "solder_mask_bridge|125250000|40000000|b4986bed-9e3a-4657-b677-1e2b4f13537c|d5a40b99-ec87-4ad8-96ee-23c121c57dc9"
+      ],
       "meta": {
         "version": 2
       },
@@ -541,11 +546,23 @@
           "label": "DNP",
           "name": "${DNP}",
           "show": true
+        },
+        {
+          "group_by": false,
+          "label": "#",
+          "name": "${ITEM_NUMBER}",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Description",
+          "name": "Description",
+          "show": false
         }
       ],
       "filter_string": "",
       "group_symbols": true,
-      "name": "Grouped By Value",
+      "name": "",
       "sort_asc": true,
       "sort_field": "Reference"
     },

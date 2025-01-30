@@ -5841,10 +5841,10 @@
 		)
 		(uuid "43e30970-7913-497c-a20d-dc8301563326")
 	)
-	(text_box "Transistors could be replaced by ULN (n channel transistor array) and UDN (p channel transistor array)\nin the future."
+	(text_box "TODO:\n- VCC of speaker not connected to VSYS\n- R14 shall not exist\n- instead, place 512 Ohm between +buzzer and VSYS \n- alternative - potentiometer\n\nNote:\nTransistors could be replaced by ULN (n channel transistor array) and UDN (p channel transistor array)\nin the future."
 		(exclude_from_sim no)
-		(at 212.09 104.14 0)
-		(size 45.72 12.7)
+		(at 212.09 90.17 0)
+		(size 46.99 26.67)
 		(stroke
 			(width 0)
 			(type default)

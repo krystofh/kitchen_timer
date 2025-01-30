@@ -1,4 +1,4 @@
-24201653579391338
+24212049810807817
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -54781,6 +54781,48 @@ SMD SMT ceramic resonator filter filter hand-soldering
 0
 3
 3
+Custom_footprints
+JST_2pin_2.54mm_female
+
+
+0
+2
+2
+Custom_footprints
+JST_EH_B2B-EH-A_1x02_P2.50mm_Vertical
+JST EH series connector, B2B-EH-A (http://www.jst-mfg.com/product/pdf/eng/eEH.pdf), generated with kicad-footprint-generator
+connector JST EH vertical
+0
+2
+2
+Custom_footprints
+Piezzo_10mm_6.5mm_combined
+
+
+0
+4
+4
+Custom_footprints
+RPi_Pico_SMD_TH
+Through hole straight pin header, 2x20, 2.54mm pitch, double rows
+Through hole pin header THT 2x20 2.54mm double row
+0
+86
+43
+Custom_footprints
+SOT-23_Handsoldering_renumbered
+SOT-23, Handsoldering
+SOT-23
+0
+3
+3
+Custom_footprints
+Segment_display_4041BS-1
+
+
+0
+12
+12
 Diode_SMD
 D_0201_0603Metric
 Diode SMD 0201 (0603 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: https://www.vishay.com/docs/20052/crcw0201e3.pdf), generated with kicad-footprint-generator
